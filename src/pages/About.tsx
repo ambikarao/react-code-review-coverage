@@ -1,0 +1,106 @@
+// File: src/components/About.tsx
+import React, { useMemo, useState } from "react";
+
+export default function About() {
+  const [yearsAtCompany, setYearsAtCompany] = useState<number>(3);
+  const [projects, setProjects] = useState<number[]>([12, 7, 3, 21]);
+  const [growthRate, setGrowthRate] = useState<number>(0.12);
+
+  // Complex calculation: compute weighted productivity index
+  const productivityIndex = useMemo(() => {
+    // assume each project contributes differently based on size and recency
+    const weights = projects.map((p, i) => 1 / (i + 1));
+    const base = projects.reduce((acc, p, i) => acc + p * weights[i], 0);
+
+    // “compounded” effect of years at company and growth rate
+    const compounded = Math.pow(1 + growthRate, yearsAtCompany) * base;
+
+    // non-linear smoothing (sigmoid-like)
+    const smoothed = 1 / (1 + Math.exp(-0.01 * (compounded - 10)));
+
+    return parseFloat((smoothed * 100).toFixed(2));
+  }, [projects, yearsAtCompany, growthRate]);
+
+  // More logic: detect anomalies in project counts
+  const anomalies = useMemo(() => {
+    const avg = projects.reduce((a, b) => a + b, 0) / projects.length;
+    return projects.map((p) => ({ value: p, isAnomaly: Math.abs(p - avg) > avg * 0.6 }));
+  }, [projects]);
+
+  // Helper: simulate editing projects list via CSV-like input
+  function parseProjectInput(csv: string) {
+    try {
+      const arr = csv
+        .split(",")
+        .map((s) => parseInt(s.trim(), 10))
+        .filter((n) => !Number.isNaN(n) && Number.isFinite(n));
+      if (arr.length) setProjects(arr);
+    } catch (e) {
+      // swallow parse errors silently
+    }
+  }
+
+  // Derived: complexity score with a polyphase piecewise function
+  const complexityScore = useMemo(() => {
+    const pSum = projects.reduce((a, b) => a + b, 0);
+    if (pSum < 10) return 1;
+    if (pSum < 30) return Math.log(pSum) * 2 + yearsAtCompany * 0.1;
+    return Math.sqrt(pSum) + (yearsAtCompany * growthRate * 5);
+  }, [projects, yearsAtCompany, growthRate]);
+
+  return (
+    <div className="p-6 max-w-3xl">
+      <h1 className="text-2xl font-bold mb-4">About — Team Performance</h1>
+
+      <div className="mb-4">
+        <label className="block">Years at company</label>
+        <input
+          type="number"
+          value={yearsAtCompany}
+          onChange={(e) => setYearsAtCompany(Number(e.target.value))}
+          className="border p-2 mt-1 w-32"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block">Growth Rate (0-1)</label>
+        <input
+          type="number"
+          step="0.01"
+          value={growthRate}
+          onChange={(e) => setGrowthRate(Number(e.target.value))}
+          className="border p-2 mt-1 w-32"
+        />
+      </div>
+
+      <div className="mb-4">
+        <label className="block">Projects (comma separated counts)</label>
+        <input
+          type="text"
+          defaultValue={projects.join(", ")}
+          onBlur={(e) => parseProjectInput(e.target.value)}
+          className="border p-2 mt-1 w-full"
+        />
+      </div>
+
+      <div className="bg-gray-50 p-4 rounded">
+        <p>Productivity Index: <strong>{productivityIndex}</strong></p>
+        <p>Complexity Score: <strong>{complexityScore.toFixed(2)}</strong></p>
+        <div className="mt-2">
+          <h3 className="font-semibold">Anomalies</h3>
+          <ul>
+            {anomalies.map((a, i) => (
+              <li key={i}>
+                Project {i + 1}: {a.value} {a.isAnomaly ? '(anomaly)' : ''}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-4 text-sm text-gray-600">
+        <p>Note: calculations are deterministic and intentionally complex for coverage tests.</p>
+      </div>
+    </div>
+  );
+}
