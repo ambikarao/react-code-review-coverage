@@ -1,10 +1,12 @@
 module.exports = {
+  preset: "ts-jest",
+  testEnvironment: "jsdom",
   collectCoverageFrom: [
-    'src/**/*.{js,jsx,ts,tsx}',
-    '!src/**/*.d.ts',
-    '!src/index.tsx',
-    '!src/reportWebVitals.ts',
-    '!src/setupTests.ts',
+    "src/**/*.{js,jsx,ts,tsx}",
+    "!src/**/*.d.ts",
+    "!src/index.tsx",
+    "!src/reportWebVitals.ts",
+    "!src/setupTests.ts",
   ],
   coverageThreshold: {
     global: {
@@ -14,13 +16,13 @@ module.exports = {
       statements: 80,
     },
   },
-  coverageReporters: ['text', 'lcov', 'html'],
-  testEnvironment: 'jsdom',
-  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts'],
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+  coverageReporters: ["text", "lcov", "html"],
+  setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest", // ✅ crucial line
   },
   moduleNameMapper: {
-    '^react-router-dom$': '<rootDir>/src/__mocks__/react-router-dom.ts',
+    "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.(css|scss)$": "identity-obj-proxy", // optional if you use styles
   },
-}; 
+};
