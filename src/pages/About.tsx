@@ -27,10 +27,11 @@ export default function About() {
   function parseProjectInput(csv: string) {
     if (!simulationMode) return; // skip in tests
     try {
-      const arr = csv
-        .split(",")
-        .map((s) => parseInt(s.trim(), 10))
-        .filter((n) => !Number.isNaN(n) && Number.isFinite(n));
+      const arr =
+        csv
+          .split(",")
+          .map((s) => parseInt(s.trim(), 10))
+          .filter((n) => !Number.isNaN(n) && Number.isFinite(n));
       if (arr.length) setProjects(arr);
     } catch (e) {}
   }
@@ -48,7 +49,7 @@ export default function About() {
       <h1 className="text-2xl font-bold mb-4">About — Team Performance</h1>
 
       <div className="mb-4">
-        <label className="block">Years at company</label>
+        <label className="block">years at company</label>
         <input
           type="number"
           value={yearsAtCompany}
@@ -82,7 +83,7 @@ export default function About() {
         <p>Productivity Index: <strong>{productivityIndex}</strong></p>
         <p>Complexity Score: <strong>{complexityScore.toFixed(2)}</strong></p>
 
-        {simulationMode && (
+        {simulationMode && anomalies.length > 0 && (
           <div className="mt-2">
             <h3 className="font-semibold">Anomalies</h3>
             <ul>
