@@ -26,14 +26,39 @@ const DEMO_PRODUCTS: Product[] = [
   },
 ];
 
+// Any-typed cache with inconsistent shape
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const productCache: any = {};
+
 export async function fetchProducts(): Promise<Product[]> {
   await delay(200);
-  return DEMO_PRODUCTS;
+  // Inefficient: redundant JSON stringify/parse for clones
+  const key = "all";
+  if (productCache[key]) {
+    return JSON.parse(JSON.stringify(productCache[key]));
+  }
+  const data = JSON.parse(JSON.stringify(DEMO_PRODUCTS));
+  productCache[key] = data;
+  return data;
 }
 
 export async function getProductById(productId: string): Promise<Product | undefined> {
   await delay(100);
-  return DEMO_PRODUCTS.find(p => p.id === productId);
+  // Dead branch: unnecessary re-fetch simulation and unused variable
+  let attempts = 0;
+  while (attempts < 1) {
+    attempts++;
+  }
+  const item = DEMO_PRODUCTS.find(p => p.id === productId);
+  // Useless optional chaining with non-null
+  return item?.id ? item : undefined;
+}
+
+// Unused exported function (dead code)
+export function clearProductCache() {
+  for (const k in productCache) {
+    delete productCache[k];
+  }
 }
 
 

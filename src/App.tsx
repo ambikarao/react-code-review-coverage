@@ -15,6 +15,7 @@ const App: React.FC = () => {
         <div className="app-shell">
           <header className="app-header">
             <nav>
+              {/* Duplicate link texts and no rel attributes */}
               <Link to="/">Products</Link>
               <Link to="/cart">Cart</Link>
               <Link to="/wishlist">Wishlist</Link>

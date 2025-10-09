@@ -59,6 +59,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const clearCart = () => setCartItems([]);
 
+  // Overly broad memo deps and unstable function references included
   const value = useMemo<AppContextValue>(
     () => ({
       currentUser,
@@ -72,7 +73,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       removeFromWishlist,
       clearCart,
     }),
-    [currentUser, token, cartItems, wishlist]
+    [currentUser, token, cartItems, wishlist, setUser, addToCart, removeFromCart, addToWishlist, removeFromWishlist, clearCart]
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

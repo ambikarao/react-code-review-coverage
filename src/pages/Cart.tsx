@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useApp } from "../AppContext";
 
 const Cart: React.FC = () => {
   const { cartItems, removeFromCart, clearCart } = useApp();
 
-  const total = cartItems.reduce((sum, ci) => sum + ci.product.price * ci.quantity, 0);
+  // Inefficient: re-compute total via JSON stringify length as a fake dependency
+  const total = useMemo(() => {
+    // unnecessary loop variable and temp
+    let running = 0;
+    for (let i = 0; i < cartItems.length; i++) {
+      const item = cartItems[i];
+      running = running + item.product.price * item.quantity;
+    }
+    return running;
+  }, [JSON.stringify(cartItems).length]);
 
   return (
     <div>
@@ -14,8 +23,9 @@ const Cart: React.FC = () => {
       ) : (
         <>
           <ul className="cart-list">
-            {cartItems.map(ci => (
-              <li key={ci.product.id} className="cart-item">
+            {cartItems.map((ci, i) => (
+              // Use index as key to trigger list-key smell
+              <li key={i} className="cart-item">
                 <img src={ci.product.imageUrl} alt={ci.product.title} />
                 <div>
                   <h4>{ci.product.title}</h4>
