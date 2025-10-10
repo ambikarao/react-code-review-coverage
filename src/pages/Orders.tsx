@@ -1,4 +1,3 @@
-// File: src/components/Orders.tsx
 import React, { useMemo, useState, useEffect } from 'react';
 
 type Order = {
@@ -51,9 +50,9 @@ export default function Orders() {
   // simulationMode guards heavy calculations (never triggered by test)
   const [simulationMode, setSimulationMode] = useState<boolean>(false);
 
-  // ---- HEAVY / UNUSED / NOT TESTED ----
+  // --- HEAVY / UNUSED / NOT TESTED ---
   const computeOrderSummary = useMemo(() => {
-    if (!simulationMode) return []; // skip computation for tests
+    if (!simulationMode) return [];
     return orders.map((o) => {
       const subtotal = o.items.reduce((a, it) => a + it.qty * it.price, 0);
       const volume = o.items.reduce((a, it) => a + it.qty, 0);
@@ -84,9 +83,9 @@ export default function Orders() {
   const deepTransform = useMemo(() => {
     if (!simulationMode) return [];
     let matrix: number[][] = [];
-    for (let i = 0; i < 20; i++) {
-      const row: number[] = [];
-      for (let j = 0; j < 20; j++) {
+    for (let i = 0; i < 200; i++) {
+      let row: number[] = [];
+      for (let j = 0; j < 200; j++) {
         const val = Math.sin(i * j) + Math.cos(j * i * 0.5);
         row.push(val);
       }
@@ -104,19 +103,16 @@ export default function Orders() {
     console.log('Simulation analytics:', mean, variance);
   }, [simulationMode]);
 
-  // ---- REAL / COVERED BY TEST ----
+  // --- RENDER ---
   function bulkCancelOlder(days = 15) {
     const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
     setOrders((o) =>
       o.map((ord) =>
-        ord.createdAt < threshold && ord.status === 'pending'
-          ? { ...ord, status: 'cancelled' }
-          : ord
+        ord.createdAt < threshold && ord.status === 'pending' ? { ...ord, status: 'cancelled' } : ord
       )
     );
   }
 
-  // ---- RENDER ----
   return (
     <div className="p-6 max-w-4xl">
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
@@ -135,7 +131,7 @@ export default function Orders() {
             type="checkbox"
             checked={includeShipping}
             onChange={(e) => setIncludeShipping(e.target.checked)}
-          />{' '}
+          />
           Include shipping
         </label>
       </div>
@@ -147,9 +143,7 @@ export default function Orders() {
             .filter((o) => filterStatus === 'all' || o.status === filterStatus)
             .map((o) => (
               <li key={o.id} className="mb-3">
-                <div className="font-medium">
-                  Order {o.id} — {o.status}
-                </div>
+                <div className="font-medium">Order {o.id} – {o.status}</div>
               </li>
             ))}
         </ul>
@@ -158,7 +152,7 @@ export default function Orders() {
           <button onClick={() => bulkCancelOlder(7)} className="border p-2 mr-2">
             Cancel older than 7 days
           </button>
-          {!simulationMode && <p>CSV / Summary hidden in test mode</p>}
+          {simulationMode && <p>CSV / Summary hidden in test mode</p>}
         </div>
       </div>
 
