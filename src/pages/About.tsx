@@ -54,6 +54,7 @@ export default function About() {
           value={yearsAtCompany}
           onChange={(e) => setYearsAtCompany(Number(e.target.value))}
           className="border p-2 mt-1 w-32"
+          data-testid="years-input"
         />
       </div>
 
@@ -65,6 +66,7 @@ export default function About() {
           value={growthRate}
           onChange={(e) => setGrowthRate(Number(e.target.value))}
           className="border p-2 mt-1 w-32"
+          data-testid="growth-input"
         />
       </div>
 
@@ -72,23 +74,39 @@ export default function About() {
         <label className="block">Projects (comma separated counts)</label>
         <input
           type="text"
-          defaultValue={projects.join(", ")}
+          value={projects.join(", ")}
+          onChange={(e) => setProjects(
+            e.target.value
+              .split(",")
+              .map((s) => parseInt(s.trim(), 10))
+              .filter((n) => !isNaN(n) && isFinite(n))
+          )}
           onBlur={(e) => parseProjectInput(e.target.value)}
           className="border p-2 mt-1 w-full"
+          data-testid="projects-input"
         />
       </div>
 
       <div className="bg-gray-50 p-4 rounded">
-        <p>Productivity Index: <strong>{productivityIndex}</strong></p>
-        <p>Complexity Score: <strong>{complexityScore.toFixed(2)}</strong></p>
+        <p>
+          Productivity Index: <strong data-testid="productivity-index">{productivityIndex}</strong>
+        </p>
+        <p>
+          Complexity Score: <strong data-testid="complexity-score">{complexityScore.toFixed(2)}</strong>
+        </p>
 
+<<<<<<< Updated upstream
         {simulationMode && (
           <div className="mt-2">
+=======
+        {simulationMode && anomalies.length > 0 && (
+          <div className="mt-2" data-testid="anomalies-list">
+>>>>>>> Stashed changes
             <h3 className="font-semibold">Anomalies</h3>
             <ul>
               {anomalies.map((a, i) => (
                 <li key={i}>
-                  Project {i + 1}: {a.value} {a.isAnomaly ? '(anomaly)' : ''}
+                  Project {i + 1}: {a.value} {a.isAnomaly ? "(anomaly)" : ""}
                 </li>
               ))}
             </ul>
