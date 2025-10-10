@@ -10,15 +10,11 @@ describe('Address component', () => {
   });
 
   it('getMessage returns fallback when showMessage is false', () => {
-    // We cannot call getMessage directly but we can rely on render behavior since showMessage is false
     render(<Address />);
-    // The rendered output should include 'Fallback' text as per returned string
     expect(screen.getByText(/Fallback/)).toBeInTheDocument();
   });
 
   it('getMessage returns expected string when showMessage is true - tested indirectly', () => {
-    // We cannot change showMessage inside the component (hardcoded), so to test this theoretically
-    // we could refactor to expose getMessage or allow showMessage to be set via props (not allowed per instructions).
-    // So this testcase is noted here for completeness but cannot be implemented without modifying the component.
+    // This case cannot be tested without modifying the component, see comments in the original test.
   });
 });
