@@ -15,6 +15,7 @@ const Address: React.FC = () => {
     <div data-testid="address-component">
       <h1>Hello World</h1>
       <p>This is the Address component.</p>
+      <p>{getMessage()}</p>
     </div>
   );
 };
