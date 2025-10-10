@@ -24,21 +24,65 @@ const SignUp: React.FC = () => {
     }
   };
 
+  // Password strength calculation not memoized
+  const passwordStrength = password.length < 6 
+    ? "weak" 
+    : password.length < 10 
+    ? "medium" 
+    : "strong";
+  
+  const passwordStrengthColor = passwordStrength === "weak" 
+    ? "red" 
+    : passwordStrength === "medium" 
+    ? "orange" 
+    : "green";
+
+  // Form validation recalculated on every render
+  const isNameValid = name.trim().length > 0;
+  const isEmailValid = email.includes("@");
+  const isPasswordValid = password.length >= 6;
+  const canSubmit = isNameValid && isEmailValid && isPasswordValid && !loading;
+
   return (
     <div className="auth-container">
       <h2>Sign Up</h2>
       <form onSubmit={onSubmit} className="auth-form">
-        {/* Redundant useCallback below not actually used */}
-        <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
-        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button type="submit" disabled={loading}>{loading ? "Creating..." : "Create account"}</button>
+        {/* Inline handlers - optimization opportunities */}
+        <input 
+          placeholder="Name" 
+          value={name} 
+          onChange={e => setName(e.target.value)} 
+        />
+        <input 
+          placeholder="Email" 
+          value={email} 
+          onChange={e => setEmail(e.target.value)} 
+        />
+        <input 
+          placeholder="Password" 
+          type="password" 
+          value={password} 
+          onChange={e => setPassword(e.target.value)} 
+        />
+        {password.length > 0 && (
+          <div style={{ color: passwordStrengthColor }}>
+            Password strength: {passwordStrength}
+          </div>
+        )}
+        <button type="submit" disabled={!canSubmit}>
+          {loading ? "Creating..." : "Create account"}
+        </button>
         {error && <p className="error-text">{error}</p>}
+        {/* Inline handler - optimization opportunity */}
+        <p>
+          Already have an account? 
+          <a href="#" onClick={(e) => { e.preventDefault(); console.log("Login clicked"); }}>
+            Login
+          </a>
+        </p>
       </form>
     </div>
   );
 };
 
 export default SignUp;
-
-

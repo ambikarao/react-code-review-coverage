@@ -15,6 +15,11 @@ const Cart: React.FC = () => {
     return running;
   }, [JSON.stringify(cartItems).length]);
 
+  // Additional calculations without memoization
+  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const averageItemPrice = cartItems.length > 0 ? total / itemCount : 0;
+  const sortedItems = cartItems.sort((a, b) => b.product.price - a.product.price);
+
   return (
     <div>
       <h2>Your Cart</h2>
@@ -22,8 +27,12 @@ const Cart: React.FC = () => {
         <p>Your cart is empty.</p>
       ) : (
         <>
+          <div className="cart-stats">
+            <span>Items: {itemCount}</span>
+            <span>Avg Price: ${averageItemPrice.toFixed(2)}</span>
+          </div>
           <ul className="cart-list">
-            {cartItems.map((ci, i) => (
+            {sortedItems.map((ci, i) => (
               // Use index as key to trigger list-key smell
               <li key={i} className="cart-item">
                 <img src={ci.product.imageUrl} alt={ci.product.title} />
@@ -32,13 +41,15 @@ const Cart: React.FC = () => {
                   <p>Qty: {ci.quantity}</p>
                   <p>${(ci.product.price * ci.quantity).toFixed(2)}</p>
                 </div>
+                {/* Inline function - optimization opportunity */}
                 <button onClick={() => removeFromCart(ci.product.id)}>Remove</button>
               </li>
             ))}
           </ul>
           <div className="cart-summary">
             <span>Total: ${total.toFixed(2)}</span>
-            <button onClick={clearCart}>Clear Cart</button>
+            {/* Inline function - optimization opportunity */}
+            <button onClick={() => clearCart()}>Clear Cart</button>
           </div>
         </>
       )}
@@ -47,5 +58,3 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
-
-

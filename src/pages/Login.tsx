@@ -33,20 +33,41 @@ const Login: React.FC = () => {
     }
   };
 
+  // Validation logic not memoized - runs on every render
+  const isEmailValid = email.includes("@") && email.length > 3;
+  const isPasswordValid = password.length >= 6;
+  const isFormValid = isEmailValid && isPasswordValid;
+
+  // Another calculation that could be optimized
+  const errorMessageDisplay = error ? error.toUpperCase() : "";
+
   return (
     <div className="auth-container">
       <h2>Login</h2>
       <form onSubmit={onSubmit} className="auth-form">
-        {/* Inline handlers and missing basic validation */}
-        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} />
-        <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
-        {error && <p className="error-text">{error}</p>}
+        {/* Inline handlers - optimization opportunities */}
+        <input 
+          placeholder="Email" 
+          value={email} 
+          onChange={e => setEmail(e.target.value)} 
+        />
+        <input 
+          placeholder="Password" 
+          type="password" 
+          value={password} 
+          onChange={e => setPassword(e.target.value)} 
+        />
+        <button type="submit" disabled={loading || !isFormValid}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+        {error && <p className="error-text">{errorMessageDisplay}</p>}
+        {/* Inline handler for forgot password */}
+        <a href="#" onClick={(e) => { e.preventDefault(); console.log("Forgot password clicked"); }}>
+          Forgot Password?
+        </a>
       </form>
     </div>
   );
 };
 
 export default Login;
-
-
