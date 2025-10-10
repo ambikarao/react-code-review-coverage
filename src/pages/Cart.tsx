@@ -1,24 +1,18 @@
-import React, { useMemo } from "react";
-import { useApp } from "../AppContext";
+import React, { useMemo, useCallback } from 'react';
+import { useApp } from '../AppContext';
 
-const Cart: React.FC = () => {
+const Cart: React.FC = React.memo(() => {
   const { cartItems, removeFromCart, clearCart } = useApp();
 
-  // Inefficient: re-compute total via JSON stringify length as a fake dependency
-  const total = useMemo(() => {
-    // unnecessary loop variable and temp
-    let running = 0;
-    for (let i = 0; i < cartItems.length; i++) {
-      const item = cartItems[i];
-      running = running + item.product.price * item.quantity;
-    }
-    return running;
-  }, [JSON.stringify(cartItems).length]);
+  const calculateTotal = (items) => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const total = useMemo(() => calculateTotal(cartItems), [cartItems]);
 
-  // Additional calculations without memoization
-  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const averageItemPrice = cartItems.length > 0 ? total / itemCount : 0;
-  const sortedItems = cartItems.sort((a, b) => b.product.price - a.product.price);
+  const itemCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.quantity, 0), [cartItems]);
+  const averageItemPrice = cartItems?.length > 0 ? total / itemCount : 0;
+  const sortedItems = useMemo(() => [...cartItems].sort((a, b) => b.product.price - a.product.price), [cartItems]);
+
+  const handleRemove = useCallback((id) => removeFromCart(id), [removeFromCart]);
+  const handleClear = useCallback(() => clearCart(), [clearCart]);
 
   return (
     <div>
@@ -32,29 +26,26 @@ const Cart: React.FC = () => {
             <span>Avg Price: ${averageItemPrice.toFixed(2)}</span>
           </div>
           <ul className="cart-list">
-            {sortedItems.map((ci, i) => (
-              // Use index as key to trigger list-key smell
-              <li key={i} className="cart-item">
+            {sortedItems.map((ci) => (
+              <li key={ci.product.id} className="cart-item">
                 <img src={ci.product.imageUrl} alt={ci.product.title} />
                 <div>
                   <h4>{ci.product.title}</h4>
                   <p>Qty: {ci.quantity}</p>
                   <p>${(ci.product.price * ci.quantity).toFixed(2)}</p>
                 </div>
-                {/* Inline function - optimization opportunity */}
-                <button onClick={() => removeFromCart(ci.product.id)}>Remove</button>
+                <button onClick={() => handleRemove(ci.product.id)}>Remove</button>
               </li>
             ))}
           </ul>
           <div className="cart-summary">
             <span>Total: ${total.toFixed(2)}</span>
-            {/* Inline function - optimization opportunity */}
-            <button onClick={() => clearCart()}>Clear Cart</button>
+            <button onClick={handleClear}>Clear Cart</button>
           </div>
         </>
       )}
     </div>
   );
-};
+});
 
 export default Cart;
