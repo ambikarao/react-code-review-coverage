@@ -1,12 +1,12 @@
-import React, { useCallback, useState } from "react";
-import { useApp } from "../AppContext";
-import { signUp } from "../services/authService";
+import React, { useCallback, useState, useMemo } from 'react';
+import { useApp } from '../AppContext';
+import { signUp } from '../services/authService';
 
 const SignUp: React.FC = () => {
   const { setUser } = useApp();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,28 +18,22 @@ const SignUp: React.FC = () => {
       const { user, token } = await signUp(name, email, password);
       setUser(user, token);
     } catch (err) {
-      setError("Sign up failed");
+      setError('Sign up failed');
     } finally {
       setLoading(false);
     }
   };
 
-  // Password strength calculation not memoized
-  const passwordStrength = password.length < 6 
-    ? "weak" 
-    : password.length < 10 
-    ? "medium" 
-    : "strong";
-  
-  const passwordStrengthColor = passwordStrength === "weak" 
-    ? "red" 
-    : passwordStrength === "medium" 
-    ? "orange" 
-    : "green";
+  const handleNameChange = useCallback((e) => setName(e.target.value), []);
+  const handleEmailChange = useCallback((e) => setEmail(e.target.value), []);
+  const handlePasswordChange = useCallback((e) => setPassword(e.target.value), []);
 
-  // Form validation recalculated on every render
-  const isNameValid = name.trim().length > 0;
-  const isEmailValid = email.includes("@");
+  const passwordStrength = useMemo(() => password.length < 6 ? 'weak' : password.length < 10 ? 'medium' : 'strong', [password]);
+  const passwordStrengthColor = passwordStrength === 'weak' ? 'red' : passwordStrength === 'medium' ? 'orange' : 'green';
+
+  const isValid = (value: string) => value.trim().length > 0;
+  const isNameValid = isValid(name);
+  const isEmailValid = email.includes('@');
   const isPasswordValid = password.length >= 6;
   const canSubmit = isNameValid && isEmailValid && isPasswordValid && !loading;
 
@@ -47,36 +41,21 @@ const SignUp: React.FC = () => {
     <div className="auth-container">
       <h2>Sign Up</h2>
       <form onSubmit={onSubmit} className="auth-form">
-        {/* Inline handlers - optimization opportunities */}
-        <input 
-          placeholder="Name" 
-          value={name} 
-          onChange={e => setName(e.target.value)} 
-        />
-        <input 
-          placeholder="Email" 
-          value={email} 
-          onChange={e => setEmail(e.target.value)} 
-        />
-        <input 
-          placeholder="Password" 
-          type="password" 
-          value={password} 
-          onChange={e => setPassword(e.target.value)} 
-        />
+        <input placeholder="Name" value={name} onChange={handleNameChange} />
+        <input placeholder="Email" value={email} onChange={handleEmailChange} />
+        <input placeholder="Password" type="password" value={password} onChange={handlePasswordChange} />
         {password.length > 0 && (
           <div style={{ color: passwordStrengthColor }}>
             Password strength: {passwordStrength}
           </div>
         )}
         <button type="submit" disabled={!canSubmit}>
-          {loading ? "Creating..." : "Create account"}
+          {loading ? 'Creating...' : 'Create account'}
         </button>
         {error && <p className="error-text">{error}</p>}
-        {/* Inline handler - optimization opportunity */}
         <p>
           Already have an account? 
-          <a href="#" onClick={(e) => { e.preventDefault(); console.log("Login clicked"); }}>
+          <a href="#" onClick={(e) => { e.preventDefault(); /* Remove console.log */ }}>
             Login
           </a>
         </p>
