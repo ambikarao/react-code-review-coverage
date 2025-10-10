@@ -10,11 +10,17 @@ describe('Address component', () => {
   });
 
   it('getMessage returns fallback when showMessage is false', () => {
-    render(<Address />);
+    render(<Address showMessage={false} />);
     expect(screen.getByText(/Fallback/)).toBeInTheDocument();
   });
 
-  it('getMessage returns expected string when showMessage is true - tested indirectly', () => {
-    // This case cannot be tested without modifying the component, see comments in the original test.
+  it('getMessage returns expected string when showMessage is true', () => {
+    render(<Address showMessage={true} />);
+    expect(screen.getByText('This line is never executed in default.')).toBeInTheDocument();
+  });
+
+  it('renders the component with data-testid attribute', () => {
+    render(<Address />);
+    expect(screen.getByTestId('address-component')).toBeInTheDocument();
   });
 });

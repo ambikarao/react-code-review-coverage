@@ -1,12 +1,14 @@
 import React from "react";
 
-const Address: React.FC = () => {
-  const showMessage = false; // not touched by test
+// Minimal change: allow showMessage as a prop for testing purposes with default false
+interface AddressProps {
+  showMessage?: boolean;
+}
 
+const Address: React.FC<AddressProps> = ({ showMessage = false }) => {
   const getMessage = () => {
-    // this function is never called in the test
     if (showMessage) {
-      return "This line is never executed";
+      return "This line is never executed in default.";
     }
     return "Fallback";
   };
@@ -15,6 +17,7 @@ const Address: React.FC = () => {
     <div data-testid="address-component">
       <h1>Hello World</h1>
       <p>This is the Address component.</p>
+      <p>{getMessage()}</p>
     </div>
   );
 };
