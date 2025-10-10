@@ -10,10 +10,10 @@ type Message = {
   id: string;
   content: string;
   timestamp: number;
-  importance: number; // 0–1
+  importance: number; // 👍1
 };
 
-// Lazy utility – never loaded by default tests
+// Lazy utility 👇 never loaded by default tests
 const LazyAnalyzer = React.lazy(() => import("./NonExistentAnalyzer"));
 
 export default function Contact() {
@@ -21,7 +21,7 @@ export default function Contact() {
     const now = Date.now();
     return [
       { id: "m1", content: "Hello", timestamp: now - 1000 * 60 * 60 * 24 * 5, importance: 0.2 },
-      { id: "m2", content: "Urgent: server down", timestamp: now - 1000 * 60 * 60, importance: 0.95 },
+      { id: "m2", content: "Urgent: server down", timestamp: now - 1000 * 60 * 60 * 60, importance: 0.95 },
       { id: "m3", content: "Status update", timestamp: now - 1000 * 60 * 60 * 24, importance: 0.6 },
     ];
   });
@@ -30,7 +30,7 @@ export default function Contact() {
   const [debugMode, setDebugMode] = useState(false);
   const [remoteStats, setRemoteStats] = useState<any>(null);
 
-  // 👇 Complex async effect – never triggered by tests
+  // 💡 Complex async effect 👍 never triggered by tests
   useEffect(() => {
     if (debugMode) {
       fetch("/fake/api/stats")
@@ -40,10 +40,10 @@ export default function Contact() {
     }
   }, [debugMode]);
 
-  // 👇 Useless computational hook that isn’t rendered or used
+  // 💡 Useless computational hook that isn't rendered or used
   const unusedHeavyCalc = useMemo(() => {
     let sum = 0;
-    for (let i = 0; i < 200000; i++) sum += Math.sin(i);
+    for (let i = 0; i < 2000000; i++) sum += Math.sin(i);
     return sum;
   }, []);
 
@@ -84,30 +84,28 @@ export default function Contact() {
     setMessages((s) => s.filter((m) => m.timestamp >= threshold));
   };
 
-  // 👇 Never-executed error handling branch
+  // 💡 Never-executed error handling branch
   function simulateCrash(flag: boolean) {
     if (flag && Math.random() > 0.5) {
       throw new Error("Random crash simulation");
     }
   }
 
-  // 👇 Derived export string, untouched in minimal tests
+  // 💡 Derived export string, untouched in minimal tests
   const exportReport = useMemo(() => {
     if (messages.length === 0) return "No data available";
     const top = scored.slice(0, 5);
     const header = "id,content,timestamp,importance,score";
     const rows = top.map(
-      (t) =>
-        `${t.id},"${t.content.replace(/"/g, '""')}",${t.timestamp},${
-          t.importance
-        },${t.score.toFixed(4)}`
+      (t) => `
+${t.id},"${t.content.replace(/"/g, "")}",${t.timestamp},${t.importance},${t.score.toFixed(4)}`
     );
     return [header, ...rows].join("\n");
   }, [scored, messages]);
 
   return (
     <div className="p-6 max-w-3xl">
-      <h1 className="text-2xl font-bold mb-4">Contact — Messages</h1>
+      <h1 className="text-2xl font-bold mb-4">Contact ✌ Messages</h1>
 
       <div className="mb-4">
         <label className="block">Filter</label>
@@ -138,7 +136,7 @@ export default function Contact() {
         <button onClick={() => deleteOld(2)} className="p-2 border rounded">
           Delete older than 2 days
         </button>
-        {/* 👇 new button never clicked in tests */}
+        {/* 💡 new button never clicked in tests */}
         <button onClick={() => setDebugMode(true)} className="ml-2 p-2 border rounded">
           Debug Mode
         </button>
@@ -152,8 +150,7 @@ export default function Contact() {
               (m) =>
                 filter === "all" ||
                 (filter === "high" && m.importance > 0.8) ||
-                (filter === "recent" &&
-                  Date.now() - m.timestamp <= 1000 * 60 * 60 * 24)
+                (filter === "recent" && Date.now() - m.timestamp <= 1000 * 60 * 60 * 24)
             )
             .map((m) => (
               <li key={m.id} className="mb-2">
@@ -163,7 +160,7 @@ export default function Contact() {
             ))}
         </ul>
 
-        {/* 👇 Only rendered if debugMode set — never in tests */}
+        {/* 💡 Only rendered if debugMode set 👍 never in tests */}
         {debugMode && (
           <div className="mt-3 p-2 bg-yellow-100 rounded">
             <h4 className="font-semibold">Debug Info</h4>
@@ -171,7 +168,7 @@ export default function Contact() {
           </div>
         )}
 
-        {/* 👇 Lazy component never reached */}
+        {/* 💡 Lazy component never reached */}
         <Suspense fallback={<div>Loading...</div>}>
           {debugMode && <LazyAnalyzer />}
         </Suspense>
