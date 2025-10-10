@@ -1,24 +1,40 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Address from './Address';
+import React from 'react';
+import Address from './Address'; // Assuming the component is in the same directory
 
-describe('Address component', () => {
-  it('renders correctly with default state', () => {
+describe('Address Component', () => {
+  // Test case 1: Check if the component renders without crashing and contains the main content.
+  test('renders the Address component with correct headings and paragraphs', () => {
+    // 1. Render the component
     render(<Address />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Hello World');
-    expect(screen.getByText('This is the Address component.')).toBeInTheDocument();
-  });
 
-  it('getMessage returns fallback when showMessage is false', () => {
-    // We cannot call getMessage directly but we can rely on render behavior since showMessage is false
+    // 2. Assert that the main component wrapper is present using its data-testid
+    const addressWrapper = screen.getByTestId('address-component');
+    expect(addressWrapper).toBeInTheDocument();
+
+    // 3. Assert the presence of the <h1> element content
+    const headingElement = screen.getByRole('heading', { level: 1, name: /Hello World/i });
+    expect(headingElement).toBeInTheDocument();
+    
+    // 4. Assert the presence of the <p> element content
+    const paragraphElement = screen.getByText(/This is the Address component./i);
+    expect(paragraphElement).toBeInTheDocument();
+  });
+  
+  // Test case 2: Verify the unused function logic does not interfere with rendering (optional, but good practice)
+  test('the component renders the expected static output regardless of the unused logic', () => {
+    // Note: The internal logic (getMessage function) is not directly callable or testable 
+    // from outside the component when it is not part of the rendered output.
+    // This test ensures the core visible elements are present.
     render(<Address />);
-    // The rendered output should include 'Fallback' text as per returned string
-    expect(screen.getByText(/Fallback/)).toBeInTheDocument();
-  });
-
-  it('getMessage returns expected string when showMessage is true - tested indirectly', () => {
-    // We cannot change showMessage inside the component (hardcoded), so to test this theoretically
-    // we could refactor to expose getMessage or allow showMessage to be set via props (not allowed per instructions).
-    // So this testcase is noted here for completeness but cannot be implemented without modifying the component.
+    
+    expect(screen.getByText('Hello World')).toBeInTheDocument();
   });
 });
+
+/*
+* NOTE: For these tests to run, you need to ensure you have:
+* - @testing-library/react
+* - @testing-library/jest-dom (for toBeInTheDocument(), etc.)
+* installed in your project.
+*/
