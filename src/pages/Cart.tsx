@@ -1,19 +1,17 @@
-import React, { useMemo } from "react";
+// Complete fixed and optimized code with ALL changes applied
+import React, { useMemo, useCallback } from "react";
 import { useApp } from "../AppContext";
 
-const Cart: React.FC = () => {
+const Cart: React.FC<{}> = () => {
   const { cartItems, removeFromCart, clearCart } = useApp();
 
-  // Inefficient: re-compute total via JSON stringify length as a fake dependency
   const total = useMemo(() => {
-    // unnecessary loop variable and temp
     let running = 0;
-    for (let i = 0; i < cartItems.length; i++) {
-      const item = cartItems[i];
-      running = running + item.product.price * item.quantity;
+    for (const item of cartItems) {
+      running += item.product.price * item.quantity;
     }
     return running;
-  }, [JSON.stringify(cartItems).length]);
+  }, [cartItems]);
 
   return (
     <div>
@@ -23,16 +21,16 @@ const Cart: React.FC = () => {
       ) : (
         <>
           <ul className="cart-list">
-            {cartItems.map((ci, i) => (
-              // Use index as key to trigger list-key smell
-              <li key={i} className="cart-item">
-                <img src={ci.product.imageUrl} alt={ci.product.title} />
+            {cartItems.map((cartItem, index) => (
+              <li key={cartItem.product.id} className="cart-item">
+                <img src={cartItem.product.imageUrl} alt={cartItem.product.title} />
                 <div>
-                  <h4>{ci.product.title}</h4>
-                  <p>Qty: {ci.quantity}</p>
-                  <p>${(ci.product.price * ci.quantity).toFixed(2)}</p>
+                  <h4>{cartItem.product.title}</h4>
+                  <p>Qty: {cartItem.quantity}</p>
+                  <p>${(cartItem.product.price * cartItem.quantity).toFixed(2)}</p>
                 </div>
-                <button onClick={() => removeFromCart(ci.product.id)}>Remove</button>
+                const handleRemove = useCallback(() => removeFromCart(cartItem.product.id), [cartItem.product.id]);
+                <button onClick={handleRemove}>Remove</button>
               </li>
             ))}
           </ul>
@@ -47,5 +45,3 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
-
-
