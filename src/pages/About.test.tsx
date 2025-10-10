@@ -60,7 +60,45 @@ describe("About Component (Simulation Off)", () => {
     expect(screen.getByTestId("productivity-index")).toHaveTextContent("0");
     expect(screen.getByTestId("complexity-score")).toHaveTextContent("0.00");
   });
+
+  it("should handle empty and invalid projects input gracefully", async () => {
+    const user = userEvent.setup();
+    const projectsInput = screen.getByTestId("projects-input");
+
+    await user.clear(projectsInput);
+    await user.type(projectsInput, "");
+    expect(projectsInput).toHaveValue("");
+
+    await user.clear(projectsInput);
+    await user.type(projectsInput, "a, b, c");
+    expect(projectsInput).toHaveValue("a, b, c");
+    // Calculation remains zero due to simulationMode false
+    expect(screen.getByTestId("productivity-index")).toHaveTextContent("0");
+  });
+
+  it("should allow quick input changes without crashing", async () => {
+    const user = userEvent.setup();
+    const yearsInput = screen.getByTestId("years-input");
+    const growthInput = screen.getByTestId("growth-input");
+    const projectsInput = screen.getByTestId("projects-input");
+
+    await user.clear(yearsInput);
+    await user.type(yearsInput, "0");
+    expect(yearsInput).toHaveValue(0);
+
+    await user.clear(growthInput);
+    await user.type(growthInput, "0");
+    expect(growthInput).toHaveValue(0);
+
+    await user.clear(projectsInput);
+    await user.type(projectsInput, "0,0,0");
+    expect(projectsInput).toHaveValue("0,0,0");
+  });
 });
+
+// Simulated tests for enabling simulation flag - skipped as original
+// The component currently does not expose enableSimulation prop
+// But tests are preserved for reference
 
 describe.skip("About Component (Simulation On)", () => {
   beforeEach(() => {
@@ -90,12 +128,8 @@ describe.skip("About Component (Simulation On)", () => {
     const anomalyList = screen.getByRole("list");
     expect(anomalyList).toBeInTheDocument();
 
-    expect(screen.getByText(/Project 1: 12/i)).not.toHaveTextContent(
-      "(anomaly)"
-    );
-    expect(screen.getByText(/Project 2: 7/i)).not.toHaveTextContent(
-      "(anomaly)"
-    );
+    expect(screen.getByText(/Project 1: 12/i)).not.toHaveTextContent("(anomaly)");
+    expect(screen.getByText(/Project 2: 7/i)).not.toHaveTextContent("(anomaly)");
     expect(screen.getByText(/Project 3: 3/i)).toHaveTextContent("(anomaly)");
     expect(screen.getByText(/Project 4: 21/i)).toHaveTextContent("(anomaly)");
   });

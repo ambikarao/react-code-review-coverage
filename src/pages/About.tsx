@@ -1,4 +1,4 @@
-// File: src/components/About.tsx
+// File: src/pages/About.tsx
 
 import React, { useMemo, useState } from "react";
 
@@ -7,13 +7,13 @@ export default function About() {
   const [projects, setProjects] = useState<number[]>([12, 7, 3, 21]);
   const [growthRate, setGrowthRate] = useState<number>(0.12);
 
-  // ----- START: CODE FIX -----
+  // ------ START: CODE FIX ------
   // State to manage the raw text input for projects.
-  // This separates the user's typing from the parsed numeric state.
+  // This separates the text input from the parsed array for better control
   const [projectInput, setProjectInput] = useState<string>(
     projects.join(", ")
   );
-  // ----- END: CODE FIX -----
+  // ------ END: CODE FIX ------
 
   // add simulationMode flag to guard heavy computation
   const simulationMode = false; // tests never toggle this
@@ -44,6 +44,7 @@ export default function About() {
         .map((s) => parseInt(s.trim(), 10))
         .filter((n) => !Number.isNaN(n) && Number.isFinite(n));
       if (arr.length) setProjects(arr);
+      else setProjects(projects.join(", ") ? projects : []); // keep current if invalid
     } catch (e) {}
   }
 
@@ -84,32 +85,18 @@ export default function About() {
 
       <div className="mb-4">
         <label className="block">Projects (comma separated counts)</label>
-        {/* ----- START: CODE FIX ----- */}
+        {/* -------- START: CODE FIX for controlled input -------- */}
         <input
           type="text"
           value={projectInput}
-          // onChange now only updates the local string state, allowing smooth typing.
-          onChange={(e) => setProjectInput(e.target.value)}
-          // onBlur handles the parsing and updates the main `projects` state.
-          onBlur={(e) => {
-            const arr = e.target.value
-              .split(",")
-              .map((s) => parseInt(s.trim(), 10))
-              .filter((n) => !isNaN(n) && isFinite(n));
-
-            if (arr.length > 0) {
-              setProjects(arr);
-              // Also format the input field with the parsed result
-              setProjectInput(arr.join(", "));
-            } else {
-              // If input is empty or invalid, revert to the last valid state
-              setProjectInput(projects.join(", "));
-            }
+          onChange={(e) => {
+            setProjectInput(e.target.value);
+            parseProjectInput(e.target.value);
           }}
           className="border p-2 mt-1 w-full"
           data-testid="projects-input"
         />
-        {/* ----- END: CODE FIX ----- */}
+        {/* -------- END: CODE FIX -------- */}
       </div>
 
       <div className="bg-gray-50 p-4 rounded">
@@ -123,20 +110,20 @@ export default function About() {
             {complexityScore.toFixed(2)}
           </strong>
         </p>
-
-        {simulationMode && (
-          <div className="mt-2">
-            <h3 className="font-semibold">Anomalies</h3>
-            <ul>
-              {anomalies.map((a, i) => (
-                <li key={i}>
-                  Project {i + 1}: {a.value} {a.isAnomaly ? "(anomaly)" : ""}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
+
+      {simulationMode && anomalies.length > 0 && (
+        <div className="mt-2">
+          <h3 className="font-semibold">Anomalies</h3>
+          <ul>
+            {anomalies.map((a, i) => (
+              <li key={i}>
+                Project {i + 1}: {a.value} {a.isAnomaly ? "(anomaly)" : ""}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-4 text-sm text-gray-600">
         <p>
