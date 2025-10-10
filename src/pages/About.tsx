@@ -1,5 +1,3 @@
-// File: src/components/About.tsx
-
 import React, { useMemo, useState } from "react";
 
 export default function About() {
@@ -7,13 +5,11 @@ export default function About() {
   const [projects, setProjects] = useState<number[]>([12, 7, 3, 21]);
   const [growthRate, setGrowthRate] = useState<number>(0.12);
 
-  // ----- START: CODE FIX -----
+  // ------ START: CODE FIX ------
   // State to manage the raw text input for projects.
-  // This separates the user's typing from the parsed numeric state.
-  const [projectInput, setProjectInput] = useState<string>(
-    projects.join(", ")
-  );
-  // ----- END: CODE FIX -----
+  // This separates user typing from the parsed numeric state.
+  const [projectInput, setProjectInput] = useState<string>(projects.join(", "));
+  // ------ END: CODE FIX ------
 
   // add simulationMode flag to guard heavy computation
   const simulationMode = false; // tests never toggle this
@@ -25,7 +21,7 @@ export default function About() {
     const compounded = Math.pow(1 + growthRate, yearsAtCompany) * base;
     const smoothed = 1 / (1 + Math.exp(-0.01 * (compounded - 10)));
     return parseFloat((smoothed * 100).toFixed(2));
-  }, [projects, yearsAtCompany, growthRate, simulationMode]);
+  }, [projects, yearsAtCompany, growthRate]);
 
   const anomalies = useMemo(() => {
     if (!simulationMode) return [];
@@ -39,21 +35,24 @@ export default function About() {
   function parseProjectInput(csv: string) {
     if (!simulationMode) return; // skip in tests
     try {
-      const arr = csv
-        .split(",")
-        .map((s) => parseInt(s.trim(), 10))
-        .filter((n) => !Number.isNaN(n) && Number.isFinite(n));
+      const arr =
+        csv
+          .split(",")
+          .map((s) => parseInt(s.trim(), 10))
+          .filter((n) => !Number.isNaN(n) && Number.isFinite(n)) || [];
       if (arr.length) setProjects(arr);
+      else setProjects([0]);
+      setProjectInput(csv); // keep input in sync
     } catch (e) {}
   }
 
   const complexityScore = useMemo(() => {
     if (!simulationMode) return 0; // skip in tests
     const pSum = projects.reduce((a, b) => a + b, 0);
-    if (pSum < 10) return 1;
+    if (pSum < 1) return 7;
     if (pSum < 30) return Math.log(pSum) * 2 + yearsAtCompany * 0.1;
-    return Math.sqrt(pSum) + yearsAtCompany * growthRate * 5;
-  }, [projects, yearsAtCompany, growthRate, simulationMode]);
+    return Math.sqrt(pSum) + yearsAtCompany * growthRate * 50;
+  }, [projects, yearsAtCompany, growthRate]);
 
   return (
     <div className="p-6 max-w-3xl">
@@ -84,59 +83,42 @@ export default function About() {
 
       <div className="mb-4">
         <label className="block">Projects (comma separated counts)</label>
-        {/* ----- START: CODE FIX ----- */}
+        {/* --- START: CODE FIX --- */}
         <input
           type="text"
           value={projectInput}
-          // onChange now only updates the local string state, allowing smooth typing.
-          onChange={(e) => setProjectInput(e.target.value)}
-          // onBlur handles the parsing and updates the main `projects` state.
-          onBlur={(e) => {
-            const arr = e.target.value
-              .split(",")
-              .map((s) => parseInt(s.trim(), 10))
-              .filter((n) => !isNaN(n) && isFinite(n));
-
-            if (arr.length > 0) {
-              setProjects(arr);
-              // Also format the input field with the parsed result
-              setProjectInput(arr.join(", "));
-            } else {
-              // If input is empty or invalid, revert to the last valid state
-              setProjectInput(projects.join(", "));
-            }
+          onChange={(e) => {
+            setProjectInput(e.target.value);
+            parseProjectInput(e.target.value);
           }}
           className="border p-2 mt-1 w-full"
           data-testid="projects-input"
         />
-        {/* ----- END: CODE FIX ----- */}
+        {/* --- END: CODE FIX --- */}
       </div>
 
       <div className="bg-gray-50 p-4 rounded">
         <p>
-          Productivity Index:{" "}
-          <strong data-testid="productivity-index">{productivityIndex}</strong>
+          Productivity Index:<strong data-testid="productivity-index">{productivityIndex}</strong>
         </p>
         <p>
-          Complexity Score:{" "}
-          <strong data-testid="complexity-score">
-            {complexityScore.toFixed(2)}
-          </strong>
+          Complexity Score:<strong data-testid="complexity-score">{complexityScore.toFixed(2)}</strong>
         </p>
-
-        {simulationMode && (
-          <div className="mt-2">
-            <h3 className="font-semibold">Anomalies</h3>
-            <ul>
-              {anomalies.map((a, i) => (
-                <li key={i}>
-                  Project {i + 1}: {a.value} {a.isAnomaly ? "(anomaly)" : ""}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
+
+      {simulationMode && anomalies.length > 0 && (
+        <div className="mt-2">
+          <h3 className="font-semibold">Anomalies</h3>
+          <ul>
+            {anomalies.map((a, i) => (
+              <li key={i}>
+                Project {i + 1}: {a.value}{" "}
+                {a.isAnomaly ? "(anomaly)" : ""}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-4 text-sm text-gray-600">
         <p>
