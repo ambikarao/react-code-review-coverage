@@ -1,3 +1,4 @@
+
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -87,6 +88,20 @@ describe("About Component (Simulation Off)", () => {
     await user.type(growthInput, "-0.1");
     expect(growthInput).toHaveValue(-0.1);
   });
+
+  it("should handle decimals and whitespace in projects input", async () => {
+    const user = userEvent.setup();
+    const projectsInput = screen.getByTestId("projects-input");
+
+    await user.clear(projectsInput);
+    await user.type(projectsInput, "5.5, 10.1, 20   , 30");
+
+    expect(projectsInput).toHaveValue("5.5, 10.1, 20   , 30");
+
+    // Since simulation is off, calculation should be 0
+    expect(screen.getByTestId("productivity-index")).toHaveTextContent("0");
+    expect(screen.getByTestId("complexity-score")).toHaveTextContent("0.00");
+  });
 });
 
 describe("About Component (Simulation On)", () => {
@@ -150,6 +165,53 @@ describe("About Component (Simulation On)", () => {
       items.forEach((item) => {
         expect(item.textContent).toMatch(/\(anomaly\)/i);
       });
+    });
+  });
+
+  it("should handle edge case: zero years and zero projects", async () => {
+    const user = userEvent.setup();
+
+    const yearsInput = screen.getByTestId("years-input");
+    await user.clear(yearsInput);
+    await user.type(yearsInput, "0");
+
+    const projectsInput = screen.getByTestId("projects-input");
+    await user.clear(projectsInput);
+    await user.type(projectsInput, "0, 0, 0");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("productivity-index").textContent).toBe("0");
+      expect(screen.getByTestId("complexity-score").textContent).toBe("0.00");
+    });
+  });
+
+  it("should handle setting growth rate to zero", async () => {
+    const user = userEvent.setup();
+
+    const growthInput = screen.getByTestId("growth-input");
+    await user.clear(growthInput);
+    await user.type(growthInput, "0");
+
+    await waitFor(() => {
+      expect(screen.getByTestId("growth-input")).toHaveValue(0);
+      expect(parseFloat(screen.getByTestId("complexity-score").textContent || "0")).toBeGreaterThanOrEqual(0);
+    });
+  });
+
+  it("should handle projects input with invalid entries gracefully", async () => {
+    const user = userEvent.setup();
+
+    const projectsInput = screen.getByTestId("projects-input");
+    await user.clear(projectsInput);
+    // Mixed valid and invalid inputs
+    await user.type(projectsInput, "10, abc, 20, , 5");
+
+    await waitFor(() => {
+      // Calculation should ignore non-numeric and empty
+      const productivityText = screen.getByTestId("productivity-index").textContent;
+      const complexityText = screen.getByTestId("complexity-score").textContent;
+      expect(productivityText).not.toBe("0");
+      expect(complexityText).not.toBe("0.00");
     });
   });
 });

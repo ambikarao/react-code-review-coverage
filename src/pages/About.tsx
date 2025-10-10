@@ -5,11 +5,11 @@ export default function About() {
   const [projects, setProjects] = useState<number[]>([12, 7, 3, 21]);
   const [growthRate, setGrowthRate] = useState<number>(0.12);
 
-  // ------ START: CODE FIX ------
+  // --- START: CODE FIX ---
   // State to manage the raw text input for projects.
   // This separates user typing from the parsed numeric state.
   const [projectInput, setProjectInput] = useState<string>(projects.join(", "));
-  // ------ END: CODE FIX ------
+  // --- END: CODE FIX ---
 
   // add simulationMode flag to guard heavy computation
   const simulationMode = false; // tests never toggle this
@@ -42,7 +42,7 @@ export default function About() {
           .filter((n) => !Number.isNaN(n) && Number.isFinite(n)) || [];
       if (arr.length) setProjects(arr);
       else setProjects([0]);
-      setProjectInput(csv); // keep input in sync
+      setProjectInput(csv); // keep raw input synchronised
     } catch (e) {}
   }
 
@@ -63,7 +63,9 @@ export default function About() {
         <input
           type="number"
           value={yearsAtCompany}
-          onChange={(e) => setYearsAtCompany(Number(e.target.value))}
+          onChange={(e) => {
+            setYearsAtCompany(Number(e.target.value));
+          }}
           className="border p-2 mt-1 w-32"
           data-testid="years-input"
         />
@@ -75,7 +77,9 @@ export default function About() {
           type="number"
           step="0.01"
           value={growthRate}
-          onChange={(e) => setGrowthRate(Number(e.target.value))}
+          onChange={(e) => {
+            setGrowthRate(Number(e.target.value));
+          }}
           className="border p-2 mt-1 w-32"
           data-testid="growth-input"
         />
@@ -83,7 +87,7 @@ export default function About() {
 
       <div className="mb-4">
         <label className="block">Projects (comma separated counts)</label>
-        {/* --- START: CODE FIX --- */}
+        {/* --- START FIX: bind input to raw string state to control user input --- */}
         <input
           type="text"
           value={projectInput}
@@ -94,31 +98,32 @@ export default function About() {
           className="border p-2 mt-1 w-full"
           data-testid="projects-input"
         />
-        {/* --- END: CODE FIX --- */}
-      </div>
-
-      <div className="bg-gray-50 p-4 rounded">
-        <p>
-          Productivity Index:<strong data-testid="productivity-index">{productivityIndex}</strong>
-        </p>
-        <p>
-          Complexity Score:<strong data-testid="complexity-score">{complexityScore.toFixed(2)}</strong>
-        </p>
+        {/* --- END FIX --- */}
       </div>
 
       {simulationMode && anomalies.length > 0 && (
         <div className="mt-2">
           <h3 className="font-semibold">Anomalies</h3>
           <ul>
-            {anomalies.map((a, i) => (
+            {anomalies.map(({ value, isAnomaly }, i) => (
               <li key={i}>
-                Project {i + 1}: {a.value}{" "}
-                {a.isAnomaly ? "(anomaly)" : ""}
+                Project {i + 1}: {value} {isAnomaly ? "(anomaly)" : ""}
               </li>
             ))}
           </ul>
         </div>
       )}
+
+      <div className="bg-gray-50 p-4 rounded">
+        <p>
+          Productivity Index:
+          <strong data-testid="productivity-index">{productivityIndex}</strong>
+        </p>
+        <p>
+          Complexity Score:
+          <strong data-testid="complexity-score">{complexityScore.toFixed(2)}</strong>
+        </p>
+      </div>
 
       <div className="mt-4 text-sm text-gray-600">
         <p>
