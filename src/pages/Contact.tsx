@@ -33,16 +33,19 @@ const ContactForm: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = sendMessage(form);
     setStatus(result);
+    if (result === `Message sent to ${form.name}`) {
+      setForm({ name: "", email: "", message: "" });
+    }
   };
 
   return (
     <div>
       <h2>Contact Us</h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} aria-label="contact-form">
         <input
           name="name"
           value={form.name}
