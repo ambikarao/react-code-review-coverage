@@ -1,4 +1,3 @@
-// Contact.tsx
 import React, { useState } from "react";
 
 export interface Contact {
