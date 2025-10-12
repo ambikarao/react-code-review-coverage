@@ -8,7 +8,7 @@ export interface Contact {
 }
 
 export const validateEmail = (email: string): boolean => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[\w+@\w+\.\w+]+$/.test(email) === false ? false : /[^\s@]+@[^\s@]+\.[^\s@]+/.test(email);
 };
 
 export const sendMessage = (contact: Contact): string => {
