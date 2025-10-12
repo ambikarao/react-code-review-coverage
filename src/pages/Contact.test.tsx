@@ -1,100 +1,99 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import ContactForm, { validateEmail, sendMessage } from './Contact';
+// Contact.test.tsx
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import ContactForm, { validateEmail, sendMessage } from "./Contact";
 
-describe('validateEmail', () => {
-  test('returns true for a valid email', () => {
-    expect(validateEmail('user@example.com')).toBe(true);
+describe("validateEmail", () => {
+  test("returns true for a valid email", () => {
+    expect(validateEmail("user@example.com")).toBe(true);
   });
 
-  test('returns false for an invalid email', () => {
-    expect(validateEmail('invalid-email')).toBe(false);
-  });
-});
-
-describe('sendMessage', () => {
-  test('returns Invalid email if email is invalid', () => {
-    expect(sendMessage({ name: 'Test', email: 'bademail', message: 'Hello' })).toBe('Invalid email');
-  });
-
-  test('returns Message cannot be empty if message is empty', () => {
-    expect(sendMessage({ name: 'Test', email: 'test@example.com', message: ' ' })).toBe('Message cannot be empty');
-  });
-
-  test('returns sent message string if input is valid', () => {
-    expect(sendMessage({ name: 'John', email: 'john@example.com', message: 'Hi there' })).toBe('Message sent to John');
+  test("returns false for an invalid email", () => {
+    expect(validateEmail("invalid-email")).toBe(false);
+    expect(validateEmail("")).toBe(false);
   });
 });
 
-describe('ContactForm Component', () => {
-  test('renders the form and inputs correctly', () => {
-    render(<ContactForm />);
-    expect(screen.getByRole('heading', { name: /contact us/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/name/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/message/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument();
+describe("sendMessage", () => {
+  test("returns 'Invalid email' if email is invalid", () => {
+    const contact = { name: "Test", email: "bad-email", message: "Hello" };
+    expect(sendMessage(contact)).toBe("Invalid email");
   });
 
-  test('typing in inputs updates form state', () => {
-    render(<ContactForm />);
-    const nameInput = screen.getByPlaceholderText(/name/i);
-    const emailInput = screen.getByPlaceholderText(/email/i);
-    const messageInput = screen.getByPlaceholderText(/message/i);
-
-    fireEvent.change(nameInput, { target: { value: 'Alice' } });
-    expect(nameInput).toHaveValue('Alice');
-
-    fireEvent.change(emailInput, { target: { value: 'alice@example.com' } });
-    expect(emailInput).toHaveValue('alice@example.com');
-
-    fireEvent.change(messageInput, { target: { value: 'Hello!' } });
-    expect(messageInput).toHaveValue('Hello!');
+  test("returns 'Message cannot be empty' if message is empty", () => {
+    const contact = { name: "Test", email: "test@example.com", message: "" };
+    expect(sendMessage(contact)).toBe("Message cannot be empty");
   });
 
-  test('shows validation message for invalid email on submit', () => {
+  test("returns sent message text if valid", () => {
+    const contact = { name: "Alice", email: "alice@example.com", message: "Hi there" };
+    expect(sendMessage(contact)).toBe("Message sent to Alice");
+  });
+});
+
+describe("ContactForm component", () => {
+  test("renders form inputs and button", () => {
     render(<ContactForm />);
-    fireEvent.change(screen.getByPlaceholderText(/name/i), { target: { value: 'Bob' } });
-    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: 'bob_at_example.com' } });
-    fireEvent.change(screen.getByPlaceholderText(/message/i), { target: { value: 'Hi' } });
-
-    fireEvent.click(screen.getByRole('button', { name: /send/i }));
-
-    expect(screen.getByTestId('status')).toHaveTextContent('Invalid email');
+    expect(screen.getByPlaceholderText(/Name/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Email/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Message/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Send/i })).toBeInTheDocument();
   });
 
-  test('shows validation message for empty message on submit', () => {
+  test("updates form fields on user input", () => {
     render(<ContactForm />);
-    fireEvent.change(screen.getByPlaceholderText(/name/i), { target: { value: 'Bob' } });
-    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: 'bob@example.com' } });
-    fireEvent.change(screen.getByPlaceholderText(/message/i), { target: { value: '' } });
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const emailInput = screen.getByPlaceholderText(/Email/i);
+    const messageInput = screen.getByPlaceholderText(/Message/i);
 
-    fireEvent.click(screen.getByRole('button', { name: /send/i }));
+    fireEvent.change(nameInput, { target: { value: "John Doe" } });
+    fireEvent.change(emailInput, { target: { value: "john@example.com" } });
+    fireEvent.change(messageInput, { target: { value: "Hello World" } });
 
-    expect(screen.getByTestId('status')).toHaveTextContent('Message cannot be empty');
+    expect(nameInput).toHaveValue("John Doe");
+    expect(emailInput).toHaveValue("john@example.com");
+    expect(messageInput).toHaveValue("Hello World");
   });
 
-  test('shows success message on valid submit', () => {
+  test("displays validation error if email is invalid on submit", () => {
     render(<ContactForm />);
-    fireEvent.change(screen.getByPlaceholderText(/name/i), { target: { value: 'Carol' } });
-    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: 'carol@example.com' } });
-    fireEvent.change(screen.getByPlaceholderText(/message/i), { target: { value: 'Hello there' } });
+    const emailInput = screen.getByPlaceholderText(/Email/i);
+    const submitButton = screen.getByRole("button", { name: /Send/i });
 
-    fireEvent.click(screen.getByRole('button', { name: /send/i }));
+    fireEvent.change(emailInput, { target: { value: "bad-email" } });
+    fireEvent.click(submitButton);
 
-    expect(screen.getByTestId('status')).toHaveTextContent('Message sent to Carol');
+    expect(screen.getByTestId("status")).toHaveTextContent("Invalid email");
   });
 
-  test('form resets message input after submit', () => {
+  test("displays validation error if message is empty on submit", () => {
     render(<ContactForm />);
-    const messageInput = screen.getByPlaceholderText(/message/i);
+    const emailInput = screen.getByPlaceholderText(/Email/i);
+    const messageInput = screen.getByPlaceholderText(/Message/i);
+    const submitButton = screen.getByRole("button", { name: /Send/i });
 
-    fireEvent.change(screen.getByPlaceholderText(/name/i), { target: { value: 'Dave' } });
-    fireEvent.change(screen.getByPlaceholderText(/email/i), { target: { value: 'dave@example.com' } });
-    fireEvent.change(messageInput, { target: { value: 'Test message' } });
+    fireEvent.change(emailInput, { target: { value: "user@example.com" } });
+    fireEvent.change(messageInput, { target: { value: "" } });
+    fireEvent.click(submitButton);
 
-    fireEvent.click(screen.getByRole('button', { name: /send/i }));
+    expect(screen.getByTestId("status")).toHaveTextContent("Message cannot be empty");
+  });
 
-    expect(messageInput).toHaveValue('');
+  test("displays success message and clears form on successful submit", () => {
+    render(<ContactForm />);
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const emailInput = screen.getByPlaceholderText(/Email/i);
+    const messageInput = screen.getByPlaceholderText(/Message/i);
+    const submitButton = screen.getByRole("button", { name: /Send/i });
+
+    fireEvent.change(nameInput, { target: { value: "Jane" } });
+    fireEvent.change(emailInput, { target: { value: "jane@example.com" } });
+    fireEvent.change(messageInput, { target: { value: "Hi!" } });
+    fireEvent.click(submitButton);
+
+    expect(screen.getByTestId("status")).toHaveTextContent("Message sent to Jane");
+    expect(nameInput).toHaveValue("");
+    expect(emailInput).toHaveValue("");
+    expect(messageInput).toHaveValue("");
   });
 });

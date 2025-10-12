@@ -8,7 +8,7 @@ export interface Contact {
 }
 
 export const validateEmail = (email: string): boolean => {
-  return /^[\w\.+\-]+@[\w\-]+\.[\w\-\.]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
 export const sendMessage = (contact: Contact): string => {
@@ -27,19 +27,18 @@ const ContactForm: React.FC = () => {
     email: "",
     message: "",
   });
-
   const [status, setStatus] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = sendMessage(form);
     setStatus(result);
-    if (result === `Message sent to ${form.name}`) {
-      setForm({ ...form, message: "" });
+    if (result.startsWith("Message sent")) {
+      setForm({ name: "", email: "", message: "" });
     }
   };
 
