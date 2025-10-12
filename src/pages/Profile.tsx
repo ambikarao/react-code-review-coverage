@@ -34,10 +34,11 @@ export const calculateProfileCompletion = (user: UserProfile): number => {
   return Math.round((filled / total) * 100);
 };
 
-export const getUserRole = (role?: "user" | "admin" | "guest"): string => {
+export const getUserRole = (role?: string): string => {
   if (!role) return "guest";
   if (role === "admin") return "admin";
-  return "user";
+  if (role === "user") return "user";
+  return "guest";
 };
 
 const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
@@ -46,14 +47,16 @@ const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [upgraded, setUpgraded] = useState(false);
 
   const handleToggleBio = () => {
-    setShowBio((prev) => !prev);
+    setShowBio(prev => !prev);
   };
 
   const handleSendMessage = () => {
     if (!user.email) {
-      setStatus("Email not available");
-    } else if (!isAdult(user.age)) {
-      setStatus("User is under 18");
+      if (isAdult(user.age)) {
+        setStatus("User is under 18");
+      } else {
+        setStatus(`Message sent to ${user.email}`);
+      }
     } else {
       setStatus(`Message sent to ${user.email}`);
     }
@@ -73,9 +76,7 @@ const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
 
   return (
     <div>
-      <h2 data-testid="greeting">
-        {getGreeting(formatUserName(user.name))}
-      </h2>
+      <h2 data-testid="greeting">{getGreeting(formatUserName(user.name))}</h2>
       <p>Age: {user.age}</p>
       <p>Completion: {calculateProfileCompletion(user)}%</p>
 
@@ -85,9 +86,10 @@ const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
       {showBio && user.bio && <p data-testid="bio">{user.bio}</p>}
 
       <button onClick={handleSendMessage}>Send Message</button>
-      <button onClick={handleUpgrade}>Upgrade</button>
+      <button onClick={handleUpgrade}>Update</button>
 
       {upgraded && <span data-testid="premium-badge">⭐ Premium User</span>}
+
       <p data-testid="status">{status}</p>
     </div>
   );
