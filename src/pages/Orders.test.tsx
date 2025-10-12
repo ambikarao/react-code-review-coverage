@@ -1,18 +1,19 @@
 import React from 'react';
+import { render, screen } from '@testing-library/react';
 import Orders from './Orders';
 
-jest.mock('react', () => {
-  const actualReact = jest.requireActual('react');
-  return {
-    ...actualReact,
-    useEffect: jest.fn(),
-    useMemo: (fn: any) => [],
-    useState: (init: any) => [init, jest.fn()],
-  };
-});
+describe('Orders Component (Low Coverage)', () => {
+  test('renders Orders header and loading elements minimally', () => {
+    render(<Orders />);
 
-test('Orders component exists', () => {
-  // Call the function once to register minimal execution
-  Orders();
-  expect(typeof Orders).toBe('function');
+    // Check header renders
+    expect(screen.getByText(/Orders/i)).toBeInTheDocument();
+
+    // Check that CSV / summary message is present
+    expect(screen.getByText(/CSV \/ Summary hidden in test mode/i)).toBeInTheDocument();
+
+    // Optional: check at least one order exists (minimal interaction)
+    const firstOrder = screen.getAllByText(/Order o/i)[0];
+    expect(firstOrder).toBeInTheDocument();
+  });
 });
