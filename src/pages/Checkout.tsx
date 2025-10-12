@@ -52,7 +52,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onSubmit }) => {
         onChange={(e) => setPayment(e.target.value)}
       >
         <option value="credit">Credit Card</option>
-        <option value="paypal">PayPal</option>
+        <option value="payPal">PayPal</option>
       </select>
 
       <button type="submit" data-testid="submit-btn">
