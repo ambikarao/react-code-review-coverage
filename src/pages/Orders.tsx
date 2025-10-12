@@ -26,18 +26,14 @@ const Orders: React.FC = () => {
       setOrders(data);
     } catch (err) {
       setError('Failed to fetch orders');
-    } finally {
       setLoading(false);
+      return;
     }
+    setLoading(false);
   };
 
-  const markAsDelivered = (id: number) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === id ? { ...order, delivered: true } : order
-      )
-    );
-  };
+  const markAsDelivered = (id: number) => (prev: Order[]) =>
+    prev.map(order => (order.id === id ? { ...order, delivered: true } : order));
 
   const totalItems = () => {
     return orders.reduce((sum, order) => sum + order.quantity, 0);
@@ -54,12 +50,12 @@ const Orders: React.FC = () => {
     <div>
       <h1>Orders</h1>
       <ul>
-        {orders.map((order) => (
+        {orders.map(order => (
           <li key={order.id}>
             {order.product} - {order.quantity} pcs -{' '}
             {order.delivered ? 'Delivered' : 'Pending'}
             {!order.delivered && (
-              <button onClick={() => markAsDelivered(order.id)}>
+              <button onClick={() => setOrders(markAsDelivered(order.id))}>
                 Mark as Delivered
               </button>
             )}
@@ -71,4 +67,5 @@ const Orders: React.FC = () => {
   );
 };
 
+export { markAsDelivered, totalItems };
 export default Orders;
