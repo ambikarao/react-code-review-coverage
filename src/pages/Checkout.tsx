@@ -19,7 +19,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onSubmit }) => {
   const resetForm = () => {
     setName("");
     setAddress("");
-    setPayment("credit");
+    setPayment("");
   };
 
   const validate = () => {
