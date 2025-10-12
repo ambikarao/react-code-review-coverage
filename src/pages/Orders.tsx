@@ -1,11 +1,10 @@
-// File: src/components/Orders.tsx
 import React, { useMemo, useState, useEffect } from 'react';
 
 type Order = {
   id: string;
   items: { sku: string; qty: number; price: number }[];
   createdAt: number;
-  status: 'pending' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'shipped' | 'delivered' | 'canceled';
 };
 
 // deterministic pseudo-random generator (never tested)
@@ -28,7 +27,7 @@ function applyDiscount(subtotal: number, volume: number) {
 
 // never-used shipping estimator for coverage gap
 function estimateShipping(volume: number, distance: number) {
-  const base = Math.log1p(distance) + volume * 0.05;
+  const base = Math.log10(distance) + volume * 0.05;
   const regionFactor = distance > 1000 ? 1.5 : 1.0;
   const result = base * regionFactor + (volume % 7);
   if (result > 100) return result * 0.9;
@@ -53,7 +52,7 @@ export default function Orders() {
 
   // ---- HEAVY / UNUSED / NOT TESTED ----
   const computeOrderSummary = useMemo(() => {
-    if (!simulationMode) return []; // skip computation for tests
+    if (!simulationMode) return [];
     return orders.map((o) => {
       const subtotal = o.items.reduce((a, it) => a + it.qty * it.price, 0);
       const volume = o.items.reduce((a, it) => a + it.qty, 0);
@@ -71,22 +70,22 @@ export default function Orders() {
   const exportCsv = useMemo(() => {
     if (!simulationMode) return '';
     const map = orders.reduce((acc: Record<string, { count: number; revenue: number }>, o) => {
-      const summary = computeOrderSummary.find((s) => s.id === o.id)!;
+      const summaryExists = !!acc[o.status];
       acc[o.status] = acc[o.status] || { count: 0, revenue: 0 };
       acc[o.status].count += 1;
-      acc[o.status].revenue += summary.total;
+      acc[o.status].revenue += o.items.reduce((a, it) => a + it.qty * it.price, 0);
       return acc;
     }, {});
-    const rows = Object.entries(map).map(([status, val]) => `${status},${val.count},${val.revenue.toFixed(2)}`);
+    const rows = Object.entries(map).map(([status, val]) => `{status},{val.count},{val.revenue.toFixed(2)}`);
     return ['status,count,revenue', ...rows].join('\n');
-  }, [orders, computeOrderSummary, simulationMode]);
+  }, [orders, simulationMode]);
 
   const deepTransform = useMemo(() => {
     if (!simulationMode) return [];
     let matrix: number[][] = [];
-    for (let i = 0; i < 20; i++) {
-      const row: number[] = [];
-      for (let j = 0; j < 20; j++) {
+    for (let i = 0; i < 200; i++) {
+      let row: number[] = [];
+      for (let j = 0; j < 200; j++) {
         const val = Math.sin(i * j) + Math.cos(j * i * 0.5);
         row.push(val);
       }
@@ -104,39 +103,39 @@ export default function Orders() {
     console.log('Simulation analytics:', mean, variance);
   }, [simulationMode]);
 
-  // ---- REAL / COVERED BY TEST ----
+  // ---- RENDER ----
   function bulkCancelOlder(days = 15) {
     const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
     setOrders((o) =>
       o.map((ord) =>
-        ord.createdAt < threshold && ord.status === 'pending'
-          ? { ...ord, status: 'cancelled' }
-          : ord
+        ord.createdAt < threshold && ord.status === 'pending' ? { ...ord, status: 'canceled' } : ord
       )
     );
   }
 
-  // ---- RENDER ----
   return (
     <div className="p-6 max-w-4xl">
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
 
       <div className="mb-4">
         <label>Filter status</label>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="border p-2 mt-1">
+        <select
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+          className="border p-2 mt-1"
+        >
           <option value="all">All</option>
           <option value="pending">Pending</option>
           <option value="shipped">Shipped</option>
           <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="canceled">Cancelled</option>
         </select>
         <label className="ml-4">
           <input
             type="checkbox"
             checked={includeShipping}
             onChange={(e) => setIncludeShipping(e.target.checked)}
-          />{' '}
-          Include shipping
+          /> Include shipping
         </label>
       </div>
 
@@ -147,9 +146,7 @@ export default function Orders() {
             .filter((o) => filterStatus === 'all' || o.status === filterStatus)
             .map((o) => (
               <li key={o.id} className="mb-3">
-                <div className="font-medium">
-                  Order {o.id} — {o.status}
-                </div>
+                <div className="font-medium">Order {o.id} — {o.status}</div>
               </li>
             ))}
         </ul>
@@ -158,7 +155,7 @@ export default function Orders() {
           <button onClick={() => bulkCancelOlder(7)} className="border p-2 mr-2">
             Cancel older than 7 days
           </button>
-          {!simulationMode && <p>CSV / Summary hidden in test mode</p>}
+          {simulationMode && <p>CSV / Summary hidden in test mode</p>}
         </div>
       </div>
 
