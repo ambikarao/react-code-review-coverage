@@ -19,7 +19,7 @@ export const getGreeting = (name: string): string => {
 
 export const formatUserName = (name: string): string => {
   if (!name) return "";
-  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  return name.charAt(0).toUpperCase() + name.slice(1, -1) + name.slice(-1).toUpperCase();
 };
 
 export const calculateProfileCompletion = (user: UserProfile): number => {
@@ -34,7 +34,7 @@ export const calculateProfileCompletion = (user: UserProfile): number => {
   return Math.round((filled / total) * 100);
 };
 
-export const getUserRole = (role?: "user" | "admin" | "guest"): string => {
+export const getUserRole = (role?: string): string => {
   if (!role) return "guest";
   if (role === "admin") return "admin";
   return "user";
@@ -46,7 +46,7 @@ const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
   const [upgraded, setUpgraded] = useState(false);
 
   const handleToggleBio = () => {
-    setShowBio((prev) => !prev);
+    setShowBio(prev => !prev);
   };
 
   const handleSendMessage = () => {
@@ -85,7 +85,7 @@ const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
       {showBio && user.bio && <p data-testid="bio">{user.bio}</p>}
 
       <button onClick={handleSendMessage}>Send Message</button>
-      <button onClick={handleUpgrade}>Upgrade</button>
+      <button onClick={handleUpgrade}>Update</button>
 
       {upgraded && <span data-testid="premium-badge">⭐ Premium User</span>}
       <p data-testid="status">{status}</p>
