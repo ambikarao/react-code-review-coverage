@@ -32,16 +32,12 @@ const Orders: React.FC = () => {
   };
 
   const markAsDelivered = (id: number) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === id ? { ...order, delivered: true } : order
-      )
+    setOrders(prev =>
+      prev.map(order => (order.id === id ? { ...order, delivered: true } : order))
     );
   };
 
-  const totalItems = () => {
-    return orders.reduce((sum, order) => sum + order.quantity, 0);
-  };
+  const totalItems = () => orders.reduce((sum, order) => sum + order.quantity, 0);
 
   useEffect(() => {
     fetchOrders();
@@ -54,14 +50,11 @@ const Orders: React.FC = () => {
     <div>
       <h1>Orders</h1>
       <ul>
-        {orders.map((order) => (
+        {orders.map(order => (
           <li key={order.id}>
-            {order.product} - {order.quantity} pcs -{' '}
-            {order.delivered ? 'Delivered' : 'Pending'}
+            {order.product} - {order.quantity} pcs - {order.delivered ? 'Delivered' : 'Pending'}
             {!order.delivered && (
-              <button onClick={() => markAsDelivered(order.id)}>
-                Mark as Delivered
-              </button>
+              <button onClick={() => markAsDelivered(order.id)}>Mark as Delivered</button>
             )}
           </li>
         ))}
@@ -72,3 +65,4 @@ const Orders: React.FC = () => {
 };
 
 export default Orders;
+export { markAsDelivered, totalItems };
