@@ -1,4 +1,3 @@
-// File: src/components/Orders.tsx
 import React, { useMemo, useState, useEffect } from 'react';
 
 type Order = {
@@ -51,15 +50,15 @@ export default function Orders() {
   // simulationMode guards heavy calculations (never triggered by test)
   const [simulationMode, setSimulationMode] = useState<boolean>(false);
 
-  // ---- HEAVY / UNUSED / NOT TESTED ----
+  // ------- HEAVY / UNUSED / NOT TESTED -------
   const computeOrderSummary = useMemo(() => {
-    if (!simulationMode) return []; // skip computation for tests
+    if (!simulationMode) return [];
     return orders.map((o) => {
       const subtotal = o.items.reduce((a, it) => a + it.qty * it.price, 0);
       const volume = o.items.reduce((a, it) => a + it.qty, 0);
       const discountAmt = applyDiscount(subtotal, volume);
       const shipping = includeShipping ? Math.max(5, volume * 0.1) : 0;
-      const tax = +(0.12 * (subtotal - discountAmt)).toFixed(2);
+      const tax = +((0.12 * (subtotal - discountAmt)).toFixed(2));
       const total = +(subtotal - discountAmt + shipping + tax).toFixed(2);
       const ageDays = Math.floor((Date.now() - o.createdAt) / (1000 * 60 * 60 * 24));
       const highValue = o.items.some((it) => it.price > 500) ? 1 : 0;
@@ -77,7 +76,7 @@ export default function Orders() {
       acc[o.status].revenue += summary.total;
       return acc;
     }, {});
-    const rows = Object.entries(map).map(([status, val]) => `${status},${val.count},${val.revenue.toFixed(2)}`);
+    const rows = Object.entries(map).map(([status, val]) => `{status},{val.count},{val.revenue.toFixed(2)}`);
     return ['status,count,revenue', ...rows].join('\n');
   }, [orders, computeOrderSummary, simulationMode]);
 
@@ -85,7 +84,7 @@ export default function Orders() {
     if (!simulationMode) return [];
     let matrix: number[][] = [];
     for (let i = 0; i < 20; i++) {
-      const row: number[] = [];
+      let row: number[] = [];
       for (let j = 0; j < 20; j++) {
         const val = Math.sin(i * j) + Math.cos(j * i * 0.5);
         row.push(val);
@@ -104,19 +103,17 @@ export default function Orders() {
     console.log('Simulation analytics:', mean, variance);
   }, [simulationMode]);
 
-  // ---- REAL / COVERED BY TEST ----
+  // ------- REAL / COVERED BY TEST -------
   function bulkCancelOlder(days = 15) {
     const threshold = Date.now() - days * 24 * 60 * 60 * 1000;
-    setOrders((o) =>
-      o.map((ord) =>
-        ord.createdAt < threshold && ord.status === 'pending'
-          ? { ...ord, status: 'cancelled' }
-          : ord
+    setOrders((os) =>
+      os.map((ord) =>
+        ord.createdAt < threshold && ord.status === 'pending' ? { ...ord, status: 'cancelled' } : ord
       )
     );
   }
 
-  // ---- RENDER ----
+  // ------- RENDER -------
   return (
     <div className="p-6 max-w-4xl">
       <h1 className="text-2xl font-bold mb-4">Orders</h1>
@@ -135,8 +132,7 @@ export default function Orders() {
             type="checkbox"
             checked={includeShipping}
             onChange={(e) => setIncludeShipping(e.target.checked)}
-          />{' '}
-          Include shipping
+          /> Include shipping
         </label>
       </div>
 
@@ -148,7 +144,7 @@ export default function Orders() {
             .map((o) => (
               <li key={o.id} className="mb-3">
                 <div className="font-medium">
-                  Order {o.id} — {o.status}
+                  Order {o.id} – {o.status}
                 </div>
               </li>
             ))}
@@ -158,7 +154,7 @@ export default function Orders() {
           <button onClick={() => bulkCancelOlder(7)} className="border p-2 mr-2">
             Cancel older than 7 days
           </button>
-          {!simulationMode && <p>CSV / Summary hidden in test mode</p>}
+          {simulationMode && <p>CSV / Summary hidden in test mode</p>}
         </div>
       </div>
 
