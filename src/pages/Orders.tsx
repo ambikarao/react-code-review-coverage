@@ -24,6 +24,7 @@ const Orders: React.FC = () => {
         { id: 2, product: 'Phone', quantity: 1, delivered: false },
       ];
       setOrders(data);
+      setLoading(false);
     } catch (err) {
       setError('Failed to fetch orders');
     } finally {
@@ -56,7 +57,7 @@ const Orders: React.FC = () => {
       <ul>
         {orders.map((order) => (
           <li key={order.id}>
-            {order.product} - {order.quantity} pcs -{' '}
+            {order.product} - {order.quantity} pcs - {' '}
             {order.delivered ? 'Delivered' : 'Pending'}
             {!order.delivered && (
               <button onClick={() => markAsDelivered(order.id)}>
