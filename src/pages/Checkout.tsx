@@ -19,11 +19,11 @@ const Checkout: React.FC<CheckoutProps> = ({ onSubmit }) => {
   const resetForm = () => {
     setName("");
     setAddress("");
-    setPayment("credit");
+    setPayment("");
   };
 
   const validate = () => {
-    if (!name.trim() || !address.trim()) {
+    if (!name.trim() || !address.trim() || !payment.trim()) {
       return false;
     }
     return true;
@@ -54,7 +54,6 @@ const Checkout: React.FC<CheckoutProps> = ({ onSubmit }) => {
         <option value="credit">Credit Card</option>
         <option value="paypal">PayPal</option>
       </select>
-
       <button type="submit" data-testid="submit-btn">
         Place Order
       </button>
