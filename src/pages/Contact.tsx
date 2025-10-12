@@ -1,4 +1,3 @@
-// Contact.tsx
 import React, { useState } from "react";
 
 export interface Contact {
@@ -22,7 +21,7 @@ export const sendMessage = (contact: Contact): string => {
 };
 
 const ContactForm: React.FC = () => {
-  const [form, setForm] = useState<Contact>({
+  const [form, setForm] = useState<Contact> ({
     name: "",
     email: "",
     message: "",
