@@ -31,14 +31,14 @@ const About: React.FC = () => {
   };
 
   // Filter users by search term
-  const filteredUsers = () => users.filter(u => u.name.includes(searchTerm));
+  const filterUsers = (): User[] => users.filter(u => u.name.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  // Count users with email
-  const countUsersWithEmail = () => users.filter(u => u.email).length;
+  // Count users with an email
+  const countUsersWithEmail = (): number => users.filter(u => u.email).length;
 
   // Lifecycle effect (we can skip for minimal coverage)
   useEffect(() => {
-    // Commenting out fetchUsers call so minimal test won't execute it
+    // Commenting out fetchUsers to keep coverage low
     // fetchUsers();
   }, []);
 
@@ -48,10 +48,8 @@ const About: React.FC = () => {
     setUsers([...users, newUser]);
   };
 
-  // Unused helper for AI to improve coverage
-  const computeStats = () => {
-    return users.length > 0 ? users.length * 2 : 0;
-  };
+  // Unused helper for AI coverage improvement
+  const computeStats = (): number => users.length > 0 ? users.length * 2 : 0;
 
   return (
     <div>
@@ -63,11 +61,9 @@ const About: React.FC = () => {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <button onClick={() => addUser('New User', 'newuser@example.com')}>
-        Add User
-      </button>
+      <button onClick={() => addUser('New User', 'newuser@example.com')}>Add User</button>
       <ul>
-        {users.map((user) => (
+        {filterUsers().map(user => (
           <li key={user.id}>
             {user.name} ({user.email})
           </li>
@@ -79,3 +75,4 @@ const About: React.FC = () => {
 };
 
 export default About;
+export { fetchUsers, filterUsers, countUsersWithEmail, addUser, computeStats };
