@@ -73,9 +73,7 @@ const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
 
   return (
     <div>
-      <h2 data-testid="greeting">
-        {getGreeting(formatUserName(user.name))}
-      </h2>
+      <h2 data-testid="greeting">{getGreeting(formatUserName(user.name))}</h2>
       <p>Age: {user.age}</p>
       <p>Completion: {calculateProfileCompletion(user)}%</p>
 
@@ -87,7 +85,7 @@ const Profile: React.FC<{ user: UserProfile }> = ({ user }) => {
       <button onClick={handleSendMessage}>Send Message</button>
       <button onClick={handleUpgrade}>Upgrade</button>
 
-      {upgraded && <span data-testid="premium-badge">⭐ Premium User</span>}
+      {upgraded && <span data-testid="premium-badge">✓ Premium User</span>}
       <p data-testid="status">{status}</p>
     </div>
   );
