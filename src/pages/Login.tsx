@@ -1,70 +1,67 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useApp } from "../AppContext";
-import { login } from "../services/authService";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useApp } from '../AppContext';
+import { login } from '../services/authService';
 
 const Login: React.FC = () => {
   const { setUser } = useApp();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mountedRef = useRef(true);
 
-  // Effect with missing dependency and side-effect in render cycle
   useEffect(() => {
     return () => {
       mountedRef.current = false;
     };
-  }, []);
+  }, [email, password]);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    if (mountedRef.current) setLoading(true);
     try {
       const { user, token } = await login(email, password);
-      // Store last login email in session for no reason
-      sessionStorage.setItem("last_login_email", email);
+      sessionStorage.setItem('last_login_email', email);
       setUser(user, token);
     } catch (err) {
-      setError("Login failed");
+      setError('Login failed');
     } finally {
       if (mountedRef.current) setLoading(false);
     }
   };
 
-  // Validation logic not memoized - runs on every render
-  const isEmailValid = email.includes("@") && email.length > 3;
-  const isPasswordValid = password.length >= 6;
+  const validateEmail = (email: string) => email.includes('@') && email.length > 3;
+  const validatePassword = (password: string) => password.length >= 6;
+  const isEmailValid = useMemo(() => validateEmail(email), [email]);
+  const isPasswordValid = useMemo(() => validatePassword(password), [password]);
   const isFormValid = isEmailValid && isPasswordValid;
 
-  // Another calculation that could be optimized
-  const errorMessageDisplay = error ? error.toUpperCase() : "";
+  const errorMessageDisplay = useMemo(() => error?.toUpperCase() || '', [error]);
+
+  const handleEmailChange = useCallback((e) => setEmail(e.target.value), []);
+  const handlePasswordChange = useCallback((e) => setPassword(e.target.value), []);
 
   return (
-    <div className="auth-container">
+    <div className='auth-container'>
       <h2>Login</h2>
-      <form onSubmit={onSubmit} className="auth-form">
-        {/* Inline handlers - optimization opportunities */}
+      <form onSubmit={onSubmit} className='auth-form'>
         <input 
-          placeholder="Email" 
+          placeholder='Email' 
           value={email} 
-          onChange={e => setEmail(e.target.value)} 
+          onChange={handleEmailChange} 
         />
         <input 
-          placeholder="Password" 
-          type="password" 
+          placeholder='Password' 
+          type='password' 
           value={password} 
-          onChange={e => setPassword(e.target.value)} 
+          onChange={handlePasswordChange} 
         />
-        <button type="submit" disabled={loading || !isFormValid}>
-          {loading ? "Logging in..." : "Login"}
+        <button type='submit' disabled={loading || !isFormValid}>
+          {loading ? 'Logging in...' : 'Login'}
         </button>
-        {error && <p className="error-text">{errorMessageDisplay}</p>}
-        {/* Inline handler for forgot password */}
-        <a href="#" onClick={(e) => { e.preventDefault(); console.log("Forgot password clicked"); }}>
-          Forgot Password?
-        </a>
+        {error && <p className='error-text'>{errorMessageDisplay}</p>}
+        <a href='#' onClick={(e) => { e.preventDefault(); /* Remove console.log */ }}>Forgot Password?</a>
       </form>
     </div>
   );
