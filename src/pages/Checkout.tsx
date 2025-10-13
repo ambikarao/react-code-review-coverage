@@ -55,7 +55,7 @@ const Checkout: React.FC<CheckoutProps> = ({ onSubmit }) => {
         <option value="paypal">PayPal</option>
       </select>
 
-      <button type="submit" data-testid="submit-btn">
+      <button type="submit" data-testid="submit-btn" disabled={!validate()}>
         Place Order
       </button>
       <button type="button" onClick={resetForm} data-testid="reset-btn">
