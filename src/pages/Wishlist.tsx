@@ -5,7 +5,7 @@ const Wishlist: React.FC = () => {
   const { wishlist, removeFromWishlist, addToCart } = useApp();
 
   // Pointless memoization on primitive
-  const count = useMemo(() => wishlist.length, [wishlist.map(w => w.product.id).join(",")]);
+  const count = useMemo(() => wishlist.length, [wishlist]);
 
   // More calculations not memoized
   const totalWishlistValue = wishlist.reduce((sum, w) => sum + w.product.price, 0);
@@ -27,7 +27,7 @@ const Wishlist: React.FC = () => {
           <div className="wishlist-stats">
             <p>Total Value: ${totalWishlistValue.toFixed(2)}</p>
             <p>Average Price: ${averageProductPrice.toFixed(2)}</p>
-            <p>Expensive Items (&gt;$100): {expensiveItems.length}</p>
+            <p>Expensive Items (&gt; $100): {expensiveItems.length}</p>
           </div>
           <ul className="wishlist-list">
             {sortedWishlist.map((w, i) => (
@@ -40,7 +40,7 @@ const Wishlist: React.FC = () => {
                   <p>Added: {new Date(w.addedAt).toLocaleString()}</p>
                 </div>
                 <div>
-                  {/* Inline functions - optimization opportunities */}
+                  {/* Inline functions - opt. opp. */}
                   <button onClick={() => addToCart(w.product, 1)}>Add to Cart</button>
                   <button onClick={() => removeFromWishlist(w.product.id)}>Remove</button>
                   <button onClick={() => console.log("View details", w.product.id)}>View</button>
