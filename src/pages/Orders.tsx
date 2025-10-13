@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 // Define order type
 export type Order = {
@@ -8,7 +8,7 @@ export type Order = {
   delivered: boolean;
 };
 
-const Orders: React.FC = () => {
+const Orders: React.FC = React.memo(() => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,13 +39,11 @@ const Orders: React.FC = () => {
     );
   };
 
-  const totalItems = () => {
-    return orders.reduce((sum, order) => sum + order.quantity, 0);
-  };
+  const totalItems = useMemo(() => orders.reduce((sum, order) => sum + order.quantity, 0), [orders]);
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [fetchOrders]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -56,19 +54,16 @@ const Orders: React.FC = () => {
       <ul>
         {orders.map((order) => (
           <li key={order.id}>
-            {order.product} - {order.quantity} pcs -{' '}
-            {order.delivered ? 'Delivered' : 'Pending'}
+            {order.product} - {order.quantity} pcs - {order.delivered ? 'Delivered' : 'Pending'}
             {!order.delivered && (
-              <button onClick={() => markAsDelivered(order.id)}>
-                Mark as Delivered
-              </button>
+              <button onClick={() => markAsDelivered(order.id)}>Mark as Delivered</button>
             )}
           </li>
         ))}
       </ul>
-      <div>Total items: {totalItems()}</div>
+      <div>Total items: {totalItems}</div>
     </div>
   );
-};
+});
 
 export default Orders;
