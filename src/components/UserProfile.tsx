@@ -91,7 +91,7 @@ const UserProfile: React.FC = () => {
         }));
         return;
       }
-      // Fallback: ignore unknown nested parent to satisfy types safely
+      // Fallback: ignore unknown nested parent to safely
       return;
     } else {
       setFormData(prev => ({
@@ -105,7 +105,6 @@ const UserProfile: React.FC = () => {
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
       setProfileData(formData);
       setIsEditing(false);
       addNotification({
