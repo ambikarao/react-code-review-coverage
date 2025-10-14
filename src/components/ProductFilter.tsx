@@ -45,7 +45,7 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilteredProdu
 
     // Filter by category
     if (newFilters.category !== 'all') {
-      filtered = filtered.filter(product => 
+      filtered = filtered.filter(product =>
         product.title.toLowerCase().includes(newFilters.category)
       );
     }
@@ -89,13 +89,13 @@ const ProductFilter: React.FC<ProductFilterProps> = ({ products, onFilteredProdu
     };
     setFilters(defaultFilters);
     applyFilters(defaultFilters);
-  };
+  }
 
   return (
     <div className="product-filter">
       <div className="filter-section">
         <h3>Filters</h3>
-        
+
         <div className="filter-group">
           <label>Category:</label>
           <select
