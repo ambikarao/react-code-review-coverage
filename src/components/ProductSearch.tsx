@@ -27,7 +27,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
     } finally {
       setIsSearching(false);
     }
-  }, [onSearch]);
+  }, [onSearch, onClear]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +37,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    
+
     // Debounced search
     const timeoutId = setTimeout(() => {
       handleSearch(value);
@@ -62,7 +62,7 @@ const ProductSearch: React.FC<ProductSearchProps> = ({
             placeholder={placeholder}
             className="search-input"
           />
-          {isSearching && <div className="search-spinner">⟳</div>}
+          {isSearching && <div className="search-spinner">🔄</div>}
           {query && (
             <button
               type="button"
