@@ -1,27 +1,22 @@
 import React from "react";
+import { render, screen } from "@testing-library/react";
+import Profile from "./Profile";
 
-type User = {
-  name: string;
-  age: number;
-  email: string;
-  bio: string;
-  role: "user";
-};
+describe("Profile Component (Very Low Coverage Baseline)", () => {
+  const mockUser = {
+    name: "alice",
+    age: 25,
+    email: "alice@example.com",
+    bio: "Software Engineer at TechCorp.",
+    role: "user" as const,
+  };
 
-type ProfileProps = {
-  user: User;
-};
+  test("renders without crashing", () => {
+    render(<Profile user={mockUser} />);
+  });
 
-const Profile: React.FC<ProfileProps> = ({ user }) => {
-  return (
-    <div>
-      <h1>{user.name}</h1>
-      <p>Age: {user.age}</p>
-      <p>Email: {user.email}</p>
-      <p>Bio: {user.bio}</p>
-      <p>Role: {user.role}</p>
-    </div>
-  );
-};
-
-export default Profile;
+  test("displays user's name somewhere in the document", () => {
+    render(<Profile user={mockUser} />);
+    expect(screen.getByText(/alice/i)).toBeInTheDocument();
+  });
+});
