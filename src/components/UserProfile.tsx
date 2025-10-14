@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../AppContext';
-import { useNotification } from './Notification';
+import { useNotification } from '../pages/Notification';
 
 interface UserProfileData {
   name: string;

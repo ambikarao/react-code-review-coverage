@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../AppContext';
 import { useNotification } from './Notification';
-import LoadingSpinner from './LoadingSpinner';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 interface OrderItem {
   productId: string;

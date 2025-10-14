@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '../models/types';
 import { useApp } from '../AppContext';
-import { useNotification } from './Notification';
+import { useNotification } from '../pages/Notification';
 
 interface ProductDetailModalProps {
   product: Product | null;
