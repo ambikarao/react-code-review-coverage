@@ -11,7 +11,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'medium', 
   color = '#007bff',
   text,
-  fullScreen = false 
+  fullScreen = false
 }) => {
   const getSize = () => {
     switch (size) {
@@ -38,7 +38,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   const containerClass = fullScreen ? 'loading-spinner-fullscreen' : 'loading-spinner-container';
 
   return (
-    <div className={containerClass}>
+    <div className={containerClass} role="region">
       <div style={spinnerStyle} />
       {text && <p className="loading-text">{text}</p>}
     </div>
