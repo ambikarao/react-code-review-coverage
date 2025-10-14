@@ -64,59 +64,7 @@ const NotificationContainer: React.FC = () => {
   const { notifications, removeNotification } = useNotification();
 
   return (
-    <div className="notification-container">
-      {notifications.map(notification => (
-        <NotificationItem
-          key={notification.id}
-          notification={notification}
-          onClose={() => removeNotification(notification.id)}
-        />
-      ))}
-    </div>
-  );
-};
-
-interface NotificationItemProps {
-  notification: Notification;
-  onClose: () => void;
-}
-
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, onClose }) => {
-  const getIcon = () => {
-    switch (notification.type) {
-      case 'success':
-        return '✓';
-      case 'error':
-        return '✗';
-      case 'warning':
-        return '⚠';
-      case 'info':
-        return 'ℹ';
-      default:
-        return 'ℹ';
-    }
-  };
-
-  return (
-    <div className={`notification notification-${notification.type}`}>
-      <div className="notification-content">
-        <div className="notification-icon">
-          {getIcon()}
-        </div>
-        <div className="notification-text">
-          <div className="notification-title">{notification.title}</div>
-          <div className="notification-message">{notification.message}</div>
-        </div>
-        <button
-          className="notification-close"
-          onClick={onClose}
-          aria-label="Close notification"
-        >
-          ✕
-        </button>
-      </div>
-      <div className="notification-progress" />
-    </div>
+    <div className="notification-progress" />
   );
 };
 
