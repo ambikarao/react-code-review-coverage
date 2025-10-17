@@ -111,6 +111,7 @@ export default function About() {
 
       <div className="mt-4 text-sm text-gray-600">
         <p>Note: calculations are deterministic and intentionally complex for coverage tests.</p>
+        <p>Test Code</p>
       </div>
     </div>
   );
