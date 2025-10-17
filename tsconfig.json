@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["DOM", "ES2020"],
+    "lib": ["DOM", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "node",
     "jsx": "react-jsx",
@@ -12,7 +12,7 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "types": ["jest", "node"]
+    "types": ["react", "react-dom", "jest", "node"]
   },
   "include": ["src"]
 }
