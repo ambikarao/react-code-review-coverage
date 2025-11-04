@@ -1,8 +1,7 @@
-// File: src/components/About.tsx
 import React, { useMemo, useState } from "react";
 
 export default function About() {
-  const [yearsAtCompany, setYearsAtCompany] = useState<number>(3;
+  const [yearsAtCompany, setYearsAtCompany] = useState<number>(3);
   const [projects, setProjects] = useState<number[]>([12, 7, 3, 21]);
   const [growthRate, setGrowthRate] = useState<number>(0.12);
 
