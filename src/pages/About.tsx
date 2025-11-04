@@ -74,12 +74,13 @@ export default function About() {
         <input
           type="text"
           value={projects.join(", ")}
-          onChange={(e) => setProjects(
-            e.target.value
+          onChange={(e) => {
+            const newProjects = e.target.value
               .split(",")
               .map((s) => parseInt(s.trim(), 10))
-              .filter((n) => !isNaN(n) && isFinite(n))
-          )}
+              .filter((n) => !isNaN(n) && isFinite(n));
+            setProjects(newProjects);
+          }}
           onBlur={(e) => parseProjectInput(e.target.value)}
           className="border p-2 mt-1 w-full"
           data-testid="projects-input"
