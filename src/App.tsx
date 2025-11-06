@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppProvider } from "./AppContext";
 import { NotificationProvider } from "./components";
-import { Header } from "./components";
+import Header from "./components/Header";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProductList from "./pages/ProductList";
@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import "./App.scss";
 
-const App: React.FC = React.memo(() => {
+const App: React.FC = () => {
   return (
     <AppProvider>
       <NotificationProvider>
@@ -39,6 +39,6 @@ const App: React.FC = React.memo(() => {
       </NotificationProvider>
     </AppProvider>
   );
-});
+};
 
 export default App;

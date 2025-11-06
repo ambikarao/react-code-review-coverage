@@ -12,7 +12,7 @@ const Header: React.FC = () => {
     navigate('/');
   }, [navigate]);
 
-  const cartItemCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.quantity, 0), [cartItems]);
+  const cartItemCount = useMemo(() => cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0), [cartItems]);
   const wishlistCount = useMemo(() => wishlist.length, [wishlist]);
 
   return (
