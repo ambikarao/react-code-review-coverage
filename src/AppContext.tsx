@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useMemo, useState, useCallback } from "react";
 import { CartItem, Product, User, WishlistItem } from "./models/types";
 
 interface AppState {
@@ -19,7 +19,7 @@ interface AppContextValue extends AppState {
 
 const AppContext = createContext<AppContextValue | undefined>(undefined);
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AppProvider: React.FC<{ children: React.ReactNode }> = React.memo(({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -30,17 +30,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setToken(authToken);
   };
 
-  const addToCart = (product: Product, quantity: number = 1) => {
+  const addToCart = useCallback((product: Product, quantity: number = 1) => {
     setCartItems(prev => {
       const existing = prev.find(ci => ci.product.id === product.id);
       if (existing) {
-        return prev.map(ci =>
-          ci.product.id === product.id ? { ...ci, quantity: ci.quantity + quantity } : ci
-        );
+        return prev.map(ci => ({ ...ci, quantity: ci.product.id === product.id ? ci.quantity + quantity : ci.quantity }));
       }
       return [...prev, { product, quantity }];
     });
-  };
+  }, []);
 
   const removeFromCart = (productId: string) => {
     setCartItems(prev => prev.filter(ci => ci.product.id !== productId));
@@ -59,30 +57,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const clearCart = () => setCartItems([]);
 
-  // Overly broad memo deps and unstable function references included
-  const value = useMemo<AppContextValue>(
-    () => ({
-      currentUser,
-      token,
-      cartItems,
-      wishlist,
-      setUser,
-      addToCart,
-      removeFromCart,
-      addToWishlist,
-      removeFromWishlist,
-      clearCart,
-    }),
-    [currentUser, token, cartItems, wishlist, setUser, addToCart, removeFromCart, addToWishlist, removeFromWishlist, clearCart]
-  );
+  const value = useMemo<AppContextValue>(() => ({
+    currentUser,
+    token,
+    cartItems,
+    wishlist,
+    setUser,
+    addToCart,
+    removeFromCart,
+    addToWishlist,
+    removeFromWishlist,
+    clearCart,
+  }), [currentUser, token, cartItems, wishlist]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
-};
+});
 
 export const useApp = (): AppContextValue => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useApp must be used within AppProvider");
   return ctx;
 };
-
-
