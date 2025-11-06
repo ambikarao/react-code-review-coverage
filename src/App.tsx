@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import "./App.scss";
 
-const App: React.FC = () => {
+const App: React.FC = React.memo(() => {
   return (
     <AppProvider>
       <NotificationProvider>
@@ -39,8 +39,6 @@ const App: React.FC = () => {
       </NotificationProvider>
     </AppProvider>
   );
-};
+});
 
 export default App;
-
-
