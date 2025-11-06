@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../AppContext';
 import { logout } from '../services/authService';
@@ -7,14 +7,13 @@ const Header: React.FC = () => {
   const { currentUser, cartItems, wishlist } = useApp();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logout();
     navigate('/');
-    window.location.reload(); // Simple way to reset app state
-  };
+  }, [navigate]);
 
-  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const wishlistCount = wishlist.length;
+  const cartItemCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.quantity, 0), [cartItems]);
+  const wishlistCount = useMemo(() => wishlist.length, [wishlist]);
 
   return (
     <header className="app-header">
