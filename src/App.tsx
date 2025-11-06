@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppProvider } from "./AppContext";
-import { NotificationProvider } from "./components";
+import { NotificationProvider } from "./components/NotificationProvider";
 import Header from "./components/Header";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
