@@ -14,7 +14,19 @@ import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import "./App.scss";
 
-const App: React.FC = () => {
+const App: React.FC<{}> = React.memo(() => {
+  const routes = [
+    { path: "/", element: <ProductList /> },
+    { path: "/login", element: <Login /> },
+    { path: "/signup", element: <SignUp /> },
+    { path: "/cart", element: <Cart /> },
+    { path: "/wishlist", element: <Wishlist /> },
+    { path: "/checkout", element: <Checkout /> },
+    { path: "/orders", element: <Orders /> },
+    { path: "/profile", element: <Profile /> },
+    { path: "/contact", element: <Contact /> },
+  ];
+
   return (
     <AppProvider>
       <NotificationProvider>
@@ -22,25 +34,13 @@ const App: React.FC = () => {
           <div className="app-shell">
             <Header />
             <main className="app-main">
-              <Routes>
-                <Route path="/" element={<ProductList />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/contact" element={<Contact />} />
-              </Routes>
+              <Routes>{routes.map(route => <Route key={route.path} {...route} />)}</Routes>
             </main>
           </div>
         </BrowserRouter>
       </NotificationProvider>
     </AppProvider>
   );
-};
+});
 
 export default App;
-
-
