@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AppProvider } from './AppContext';
-import { NotificationProvider } from './components';
+import { NotificationProvider } from './components/NotificationProvider';
 import './App.scss';
 
 const ProductList = React.lazy(() => import('./pages/ProductList'));
@@ -14,7 +14,7 @@ const Orders = React.lazy(() => import('./pages/Orders'));
 const Profile = React.lazy(() => import('./pages/Profile'));
 const Contact = React.lazy(() => import('./pages/Contact'));
 
-const App: React.FC<{}> = () => {
+const App: React.FC = () => {
   return (
     <AppProvider>
       <NotificationProvider>
