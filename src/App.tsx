@@ -14,6 +14,9 @@ import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import "./App.scss";
 
+// This will cause a build error due to type mismatch
+const buildError: number = "this is a string";
+
 const App: React.FC = () => {
   return (
     <AppProvider>
