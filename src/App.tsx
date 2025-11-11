@@ -1,8 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppProvider } from "./AppContext";
-import { NotificationProvider } from "./components";
-import { Header } from "./components";
+import { NotificationProvider, Header } from "./components";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import ProductList from "./pages/ProductList";
@@ -14,7 +13,8 @@ import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import "./App.scss";
 
-const App: React.FC = () => {
+const App: React.FC = React.memo(() => {
+  const CartRoute = useCallback(() => <Cart />, []);
   return (
     <AppProvider>
       <NotificationProvider>
@@ -23,10 +23,10 @@ const App: React.FC = () => {
             <Header />
             <main className="app-main">
               <Routes>
-                <Route path="/" element={<ProductList />} />
+                <Route key="product-list" path="/" element={<ProductList />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/cart" element={<Cart />} />
+                <Route path="/cart" element={<CartRoute />} />
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/orders" element={<Orders />} />
@@ -39,8 +39,6 @@ const App: React.FC = () => {
       </NotificationProvider>
     </AppProvider>
   );
-};
+});
 
 export default App;
-
-
