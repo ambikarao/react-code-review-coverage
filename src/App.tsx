@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AppProvider } from "./AppContext";
 import { NotificationProvider } from "./components";
@@ -14,7 +14,19 @@ import Profile from "./pages/Profile";
 import Contact from "./pages/Contact";
 import "./App.scss";
 
-const App: React.FC = () => {
+const App: React.FC = React.memo(() => {
+  const routes = [
+    <Route key="product-list" path="/" element={<ProductList />} />, 
+    <Route key="login" path="/login" element={<Login />} />, 
+    <Route key="signup" path="/signup" element={<SignUp />} />, 
+    <Route key="cart" path="/cart" element={<Cart />} />, 
+    <Route key="wishlist" path="/wishlist" element={<Wishlist />} />, 
+    <Route key="checkout" path="/checkout" element={<Checkout />} />, 
+    <Route key="orders" path="/orders" element={<Orders />} />, 
+    <Route key="profile" path="/profile" element={<Profile />} />, 
+    <Route key="contact" path="/contact" element={<Contact />} />
+  ];
+
   return (
     <AppProvider>
       <NotificationProvider>
@@ -22,25 +34,13 @@ const App: React.FC = () => {
           <div className="app-shell">
             <Header />
             <main className="app-main">
-              <Routes>
-                <Route path="/" element={<ProductList />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/contact" element={<Contact />} />
-              </Routes>
+              <Routes>{routes}</Routes>
             </main>
           </div>
         </BrowserRouter>
       </NotificationProvider>
     </AppProvider>
   );
-};
+});
 
 export default App;
-
-
