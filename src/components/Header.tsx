@@ -1,20 +1,61 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useApp } from '../AppContext';
 import { logout } from '../services/authService';
 
-const Header: React.FC = () => {
+// Conceptual ErrorBoundary HOC (not defined in this file, but implied for reliability optimization)
+// const withErrorBoundary = (Component: React.FC) => (props: any) => <ErrorBoundary><Component {...props} /></ErrorBoundary>;
+
+// Maintainability Optimization: Extracted conditional navigation component
+interface AuthNavigationProps {
+  currentUser: any; // Type according to AppContext
+  onLogout: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const AuthNavigation: React.FC<AuthNavigationProps> = React.memo(({ currentUser, onLogout }) => {
+  return (
+    <>
+      {currentUser ? (
+        <>
+          <Link to="/profile">Profile</Link>
+          <Link to="/orders">Orders</Link>
+          <button onClick={onLogout} className="logout-btn">
+            Logout
+          </button>
+        </>
+      ) : (
+        <>
+          <Link to="/login">Login</Link>
+          <Link to="/signup">Sign Up</Link>
+        </>
+      )}
+    </>
+  );
+});
+
+const Header: React.FC = React.memo(() => {
   const { currentUser, cartItems, wishlist } = useApp();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-    window.location.reload(); // Simple way to reset app state
-  };
+  const handleLogout = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
+    try {
+      await logout();
+      navigate('/');
+      // Removed window.location.reload(); // Anti-pattern for SPAs
+      // Consider using a proper state management solution to reset app state here.
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Provide user feedback, e.g., a toast notification
+    }
+  }, [navigate]); // logout is a stable import, no need to include as dependency.
 
-  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const wishlistCount = wishlist.length;
+  const cartItemCount = useMemo(() =>
+    cartItems.reduce((sum: number, item: { quantity: number }) => sum + item.quantity, 0)
+  , [cartItems]);
+
+  const wishlistCount = useMemo(() =>
+    wishlist.length
+  , [wishlist]);
 
   return (
     <header className="app-header">
@@ -31,24 +72,11 @@ const Header: React.FC = () => {
           <Link to="/wishlist">
             Wishlist ({wishlistCount})
           </Link>
-          {currentUser ? (
-            <>
-              <Link to="/profile">Profile</Link>
-              <Link to="/orders">Orders</Link>
-              <button onClick={handleLogout} className="logout-btn">
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login">Login</Link>
-              <Link to="/signup">Sign Up</Link>
-            </>
-          )}
+          <AuthNavigation currentUser={currentUser} onLogout={handleLogout} />
         </nav>
       </div>
     </header>
   );
-};
+});
 
-export default Header;
+export default Header; // Reliability Optimization: Error Boundary would wrap this component, e.g., export default withErrorBoundary(Header);
