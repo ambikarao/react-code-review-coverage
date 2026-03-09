@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Product } from '../models/types';
 import { useApp } from '../AppContext';
 import { useNotification } from '../pages/Notification';
@@ -9,28 +9,27 @@ interface ProductDetailModalProps {
   onClose: () => void;
 }
 
-const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, isOpen, onClose }) => {
+const MIN_QUANTITY = 1;
+const MAX_QUANTITY = 10;
+
+const ProductDetailModal: React.FC<ProductDetailModalProps> = React.memo(({ product, isOpen, onClose }) => {
   const { addToCart, addToWishlist, cartItems } = useApp();
   const { addNotification } = useNotification();
-  const [quantity, setQuantity] = useState(1);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(MIN_QUANTITY);
 
-  // Reset quantity when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setQuantity(1);
-      setSelectedImageIndex(0);
+      setQuantity(MIN_QUANTITY);
     }
   }, [isOpen]);
 
-  // Close modal on Escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
-    };
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' && isOpen) {
+      onClose();
+    }
+  }, [isOpen, onClose]);
 
+  useEffect(() => {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
@@ -40,11 +39,11 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, isOpen
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, handleEscape]);
 
   if (!product || !isOpen) return null;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = useCallback(() => {
     addToCart(product, quantity);
     addNotification({
       type: 'success',
@@ -52,44 +51,41 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, isOpen
       message: `${product.title} (${quantity}x) has been added to your cart.`
     });
     onClose();
-  };
+  }, [addToCart, product, quantity, addNotification, onClose]);
 
-  const handleAddToWishlist = () => {
+  const handleAddToWishlist = useCallback(() => {
     addToWishlist(product);
     addNotification({
       type: 'success',
       title: 'Added to Wishlist',
       message: `${product.title} has been added to your wishlist.`
     });
-  };
+  }, [addToWishlist, product, addNotification]);
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQuantityChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
-    if (value > 0 && value <= 10) {
+    if (value >= MIN_QUANTITY && value <= MAX_QUANTITY) {
       setQuantity(value);
     }
-  };
+  }, []);
 
-  const incrementQuantity = () => {
-    if (quantity < 10) {
-      setQuantity(prev => prev + 1);
-    }
-  };
+  const incrementQuantity = useCallback(() => {
+    setQuantity(prev => Math.min(prev + 1, MAX_QUANTITY));
+  }, []);
 
-  const decrementQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(prev => prev - 1);
-    }
-  };
+  const decrementQuantity = useCallback(() => {
+    setQuantity(prev => Math.max(prev - 1, MIN_QUANTITY));
+  }, []);
 
-  // Check if product is in cart
-  const isInCart = cartItems.some(item => item.product.id === product.id);
+  const isInCart = useMemo(() => cartItems?.some(item => item.product.id === product.id) ?? false, [cartItems, product.id]);
+
+  const handleModalContentClick = useCallback((e: React.MouseEvent) => e.stopPropagation(), []);
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content" onClick={handleModalContentClick}>
         <button className="modal-close" onClick={onClose} aria-label="Close modal">
-          ✕
+          &times;
         </button>
         
         <div className="modal-body">
@@ -113,23 +109,23 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, isOpen
                 <div className="quantity-controls">
                   <button 
                     onClick={decrementQuantity}
-                    disabled={quantity <= 1}
+                    disabled={quantity <= MIN_QUANTITY}
                     aria-label="Decrease quantity"
                   >
-                    −
+                    &minus;
                   </button>
                   <input
                     id="quantity"
                     type="number"
-                    min="1"
-                    max="10"
+                    min={MIN_QUANTITY}
+                    max={MAX_QUANTITY}
                     value={quantity}
                     onChange={handleQuantityChange}
                     className="quantity-input"
                   />
                   <button 
                     onClick={incrementQuantity}
-                    disabled={quantity >= 10}
+                    disabled={quantity >= MAX_QUANTITY}
                     aria-label="Increase quantity"
                   >
                     +
@@ -169,6 +165,6 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, isOpen
       </div>
     </div>
   );
-};
+});
 
 export default ProductDetailModal;
